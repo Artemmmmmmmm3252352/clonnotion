@@ -9,16 +9,18 @@ export const Layout = (): JSX.Element => {
   return (
     <div className="w-full h-screen flex bg-[#fafaf9]">
       <div 
-        className={`relative flex-shrink-0 transition-all duration-300 ${sidebarCollapsed ? "w-0" : "w-60"}`}
+        className={`relative flex-shrink-0 transition-all duration-300 overflow-hidden ${sidebarCollapsed ? "w-0" : "w-60"}`}
       >
-        {!sidebarCollapsed && <Sidebar />}
-        <button
-          onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-          className={`absolute top-3 ${sidebarCollapsed ? "-right-8" : "right-2"} z-50 w-6 h-6 flex items-center justify-center rounded hover:bg-[#e6e4df] text-[#9b9a97]`}
-        >
-          {sidebarCollapsed ? <ChevronsRight className="w-4 h-4" /> : <ChevronsLeft className="w-4 h-4" />}
-        </button>
+        <div className="w-60 h-full">
+          <Sidebar />
+        </div>
       </div>
+      <button
+        onClick={() => setSidebarCollapsed(prev => !prev)}
+        className={`absolute top-3 z-50 w-6 h-6 flex items-center justify-center rounded hover:bg-[#e6e4df] text-[#9b9a97] transition-all duration-300 ${sidebarCollapsed ? "left-2" : "left-[232px]"}`}
+      >
+        {sidebarCollapsed ? <ChevronsRight className="w-4 h-4" /> : <ChevronsLeft className="w-4 h-4" />}
+      </button>
       <main className="flex-1 overflow-auto">
         <Outlet />
       </main>
