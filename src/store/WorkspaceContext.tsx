@@ -119,6 +119,7 @@ interface WorkspaceContextType {
   duplicateBlock: (pageId: string, blockId: string) => void;
   moveBlock: (pageId: string, blockId: string, newIndex: number) => void;
   getPage: (id: string) => Page | undefined;
+  getPagePath: (id: string) => Page[];
   getRootPages: () => Page[];
   getChildPages: (parentId: string) => Page[];
   getFavoritePages: () => Page[];
@@ -312,6 +313,16 @@ export const WorkspaceProvider = ({ children }: { children: ReactNode }) => {
     return workspace.pages.find(page => page.id === id);
   }, [workspace.pages]);
 
+  const getPagePath = useCallback((id: string): Page[] => {
+    const path: Page[] = [];
+    let currentPage = workspace.pages.find(p => p.id === id);
+    while (currentPage) {
+      path.unshift(currentPage);
+      currentPage = currentPage.parentId ? workspace.pages.find(p => p.id === currentPage!.parentId) : undefined;
+    }
+    return path;
+  }, [workspace.pages]);
+
   const getRootPages = useCallback(() => {
     return workspace.pages.filter(page => page.parentId === null && !page.isArchived);
   }, [workspace.pages]);
@@ -347,6 +358,7 @@ export const WorkspaceProvider = ({ children }: { children: ReactNode }) => {
       duplicateBlock,
       moveBlock,
       getPage,
+      getPagePath,
       getRootPages,
       getChildPages,
       getFavoritePages,

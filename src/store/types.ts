@@ -8,6 +8,10 @@ export type BlockType =
   | 'todo'
   | 'quote'
   | 'divider'
+  | 'code'
+  | 'callout'
+  | 'toggle'
+  | 'image'
   | 'page';
 
 export interface Block {
@@ -23,6 +27,7 @@ export interface Page {
   id: string;
   title: string;
   icon?: string;
+  cover?: string;
   parentId: string | null;
   blocks: Block[];
   isFavorite: boolean;

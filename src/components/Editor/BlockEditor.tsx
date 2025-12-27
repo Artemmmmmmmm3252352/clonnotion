@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, KeyboardEvent } from "react";
-import { GripVertical, Plus, Trash2, Copy, Type, Palette, MoreHorizontal, ChevronRight } from "lucide-react";
+import { GripVertical, Plus, Trash2, Copy, Type, Palette, MoreHorizontal, ChevronRight, Code, AlertCircle, ChevronDown, ImageIcon } from "lucide-react";
 import { Block, BlockType } from "../../store/types";
 import { useWorkspace } from "../../store";
 import { Checkbox } from "../ui/checkbox";
@@ -21,6 +21,10 @@ const blockTypeLabels: Record<BlockType, string> = {
   todo: "To-do",
   quote: "Quote",
   divider: "Divider",
+  code: "Code",
+  callout: "Callout",
+  toggle: "Toggle",
+  image: "Image",
   page: "Page",
 };
 
@@ -48,7 +52,8 @@ const SlashMenu = ({
 }) => {
   const types: BlockType[] = [
     "text", "heading1", "heading2", "heading3",
-    "bulleted_list", "numbered_list", "todo", "quote", "divider"
+    "bulleted_list", "numbered_list", "todo", "quote", "divider",
+    "code", "callout", "toggle"
   ];
 
   const filteredTypes = types.filter(type => 
@@ -129,7 +134,8 @@ const BlockMenu = ({ pageId, block, onClose, position }: BlockMenuProps) => {
 
   const types: BlockType[] = [
     "text", "heading1", "heading2", "heading3",
-    "bulleted_list", "numbered_list", "todo", "quote", "divider"
+    "bulleted_list", "numbered_list", "todo", "quote", "divider",
+    "code", "callout", "toggle"
   ];
 
   return (
@@ -440,6 +446,72 @@ export const BlockEditor = ({ pageId, block, index, onFocus }: BlockEditorProps)
         );
       case "divider":
         return <hr className="border-t border-[#e6e4df] my-2" />;
+      case "code":
+        return (
+          <div className="bg-[#f7f6f3] rounded-lg p-4 font-mono text-sm">
+            <div
+              ref={contentRef}
+              contentEditable
+              suppressContentEditableWarning
+              className="outline-none min-h-[1.5em] whitespace-pre-wrap text-[#37352f]"
+              onInput={handleInput}
+              onKeyDown={handleKeyDown}
+              onFocus={onFocus}
+              data-placeholder="// Write your code here..."
+            >
+              {block.content}
+            </div>
+          </div>
+        );
+      case "callout":
+        return (
+          <div className="flex gap-3 p-4 bg-[#f7f6f3] rounded-lg">
+            <span className="text-xl">💡</span>
+            <div
+              ref={contentRef}
+              contentEditable
+              suppressContentEditableWarning
+              className={`${baseClass} text-[15px] ${textColorClass}`}
+              onInput={handleInput}
+              onKeyDown={handleKeyDown}
+              onFocus={onFocus}
+              data-placeholder="Type something..."
+            >
+              {block.content}
+            </div>
+          </div>
+        );
+      case "toggle":
+        return (
+          <div>
+            <div className="flex items-start gap-1">
+              <button className="mt-0.5 p-0.5 hover:bg-[#efefec] rounded">
+                <ChevronDown className="w-4 h-4 text-[#9b9a97]" />
+              </button>
+              <div
+                ref={contentRef}
+                contentEditable
+                suppressContentEditableWarning
+                className={`${baseClass} text-[15px] font-medium ${textColorClass}`}
+                onInput={handleInput}
+                onKeyDown={handleKeyDown}
+                onFocus={onFocus}
+                data-placeholder="Toggle"
+              >
+                {block.content}
+              </div>
+            </div>
+          </div>
+        );
+      case "image":
+        return (
+          <div className="relative bg-[#f7f6f3] rounded-lg p-8 flex items-center justify-center border-2 border-dashed border-[#e6e4df]">
+            <div className="text-center">
+              <ImageIcon className="w-8 h-8 text-[#9b9a97] mx-auto mb-2" />
+              <p className="text-sm text-[#9b9a97]">Click to add an image</p>
+            </div>
+          </div>
+        );
       default:
         return (
           <div
