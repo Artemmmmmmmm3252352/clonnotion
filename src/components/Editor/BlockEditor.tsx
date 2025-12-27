@@ -330,6 +330,7 @@ export const BlockEditor = ({ pageId, block, index, onFocus }: BlockEditorProps)
             ref={contentRef}
             contentEditable
             suppressContentEditableWarning
+            dir="ltr"
             className={`${baseClass} text-3xl font-bold ${textColorClass}`}
             onInput={handleInput}
             onKeyDown={handleKeyDown}
@@ -345,6 +346,7 @@ export const BlockEditor = ({ pageId, block, index, onFocus }: BlockEditorProps)
             ref={contentRef}
             contentEditable
             suppressContentEditableWarning
+            dir="ltr"
             className={`${baseClass} text-2xl font-semibold ${textColorClass}`}
             onInput={handleInput}
             onKeyDown={handleKeyDown}
@@ -360,6 +362,7 @@ export const BlockEditor = ({ pageId, block, index, onFocus }: BlockEditorProps)
             ref={contentRef}
             contentEditable
             suppressContentEditableWarning
+            dir="ltr"
             className={`${baseClass} text-xl font-medium ${textColorClass}`}
             onInput={handleInput}
             onKeyDown={handleKeyDown}
@@ -377,6 +380,7 @@ export const BlockEditor = ({ pageId, block, index, onFocus }: BlockEditorProps)
               ref={contentRef}
               contentEditable
               suppressContentEditableWarning
+              dir="ltr"
               className={`${baseClass} text-[15px] ${textColorClass}`}
               onInput={handleInput}
               onKeyDown={handleKeyDown}
@@ -395,6 +399,7 @@ export const BlockEditor = ({ pageId, block, index, onFocus }: BlockEditorProps)
               ref={contentRef}
               contentEditable
               suppressContentEditableWarning
+              dir="ltr"
               className={`${baseClass} text-[15px] ${textColorClass}`}
               onInput={handleInput}
               onKeyDown={handleKeyDown}
@@ -417,6 +422,7 @@ export const BlockEditor = ({ pageId, block, index, onFocus }: BlockEditorProps)
               ref={contentRef}
               contentEditable
               suppressContentEditableWarning
+              dir="ltr"
               className={`${baseClass} text-[15px] ${block.checked ? "line-through text-[#9b9a97]" : textColorClass}`}
               onInput={handleInput}
               onKeyDown={handleKeyDown}
@@ -434,6 +440,7 @@ export const BlockEditor = ({ pageId, block, index, onFocus }: BlockEditorProps)
               ref={contentRef}
               contentEditable
               suppressContentEditableWarning
+              dir="ltr"
               className={`${baseClass} text-[15px] italic ${textColorClass}`}
               onInput={handleInput}
               onKeyDown={handleKeyDown}
@@ -453,6 +460,7 @@ export const BlockEditor = ({ pageId, block, index, onFocus }: BlockEditorProps)
               ref={contentRef}
               contentEditable
               suppressContentEditableWarning
+              dir="ltr"
               className="outline-none min-h-[1.5em] whitespace-pre-wrap text-[#37352f]"
               onInput={handleInput}
               onKeyDown={handleKeyDown}
@@ -471,6 +479,7 @@ export const BlockEditor = ({ pageId, block, index, onFocus }: BlockEditorProps)
               ref={contentRef}
               contentEditable
               suppressContentEditableWarning
+              dir="ltr"
               className={`${baseClass} text-[15px] ${textColorClass}`}
               onInput={handleInput}
               onKeyDown={handleKeyDown}
@@ -492,6 +501,7 @@ export const BlockEditor = ({ pageId, block, index, onFocus }: BlockEditorProps)
                 ref={contentRef}
                 contentEditable
                 suppressContentEditableWarning
+                dir="ltr"
                 className={`${baseClass} text-[15px] font-medium ${textColorClass}`}
                 onInput={handleInput}
                 onKeyDown={handleKeyDown}
@@ -518,6 +528,7 @@ export const BlockEditor = ({ pageId, block, index, onFocus }: BlockEditorProps)
             ref={contentRef}
             contentEditable
             suppressContentEditableWarning
+            dir="ltr"
             className={`${baseClass} text-[15px] ${textColorClass}`}
             onInput={handleInput}
             onKeyDown={handleKeyDown}
