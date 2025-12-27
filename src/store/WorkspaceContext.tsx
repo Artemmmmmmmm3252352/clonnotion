@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useState, useCallback, ReactNode } from 'react';
-import { Workspace, Page, Block, Database, BlockType } from './types';
+import { createContext, useContext, useState, useCallback, ReactNode } from 'react';
+import { Workspace, Page, Block, Database } from './types';
 
 const generateId = () => Math.random().toString(36).substr(2, 9);
 
