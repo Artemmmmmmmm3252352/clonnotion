@@ -64,6 +64,14 @@ public/              - Static assets
 - Extended block types: Code, Callout, Toggle, Image
 - Created RecordModal for database record details
 - Implemented collapsible sidebar with state preservation
+- Restructured sidebar with Notion-style sections (Search, Home, Meetings, NoteZero AI, Inbox, Private, Shared, etc.)
+- Created Welcome to NoteZero! onboarding page with checklist
+- Added To Do List database with onboarding tasks
+- Implemented Share panel with invite and copy link functionality
+- Added global search modal (Ctrl+K shortcut)
+- Created floating AI chat widget with message history
+- Built Template Gallery modal for page creation
+- Added Settings, Marketplace, Inbox, Meetings, and AI pages
 
 ## Development
 - Dev server: `npm run dev` (port 5000)
