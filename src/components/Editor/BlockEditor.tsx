@@ -233,6 +233,23 @@ export const BlockEditor = ({ pageId, block, index, onFocus }: BlockEditorProps)
   const [isDragging, setIsDragging] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
   const blockRef = useRef<HTMLDivElement>(null);
+  const isInitialized = useRef(false);
+
+  useEffect(() => {
+    if (contentRef.current && !isInitialized.current) {
+      contentRef.current.innerText = block.content;
+      isInitialized.current = true;
+    }
+  }, []);
+
+  useEffect(() => {
+    if (contentRef.current && contentRef.current.innerText !== block.content) {
+      const isFocused = document.activeElement === contentRef.current;
+      if (!isFocused) {
+        contentRef.current.innerText = block.content;
+      }
+    }
+  }, [block.content]);
 
   const handleInput = () => {
     if (contentRef.current) {
@@ -336,9 +353,7 @@ export const BlockEditor = ({ pageId, block, index, onFocus }: BlockEditorProps)
             onKeyDown={handleKeyDown}
             onFocus={onFocus}
             data-placeholder="Heading 1"
-          >
-            {block.content}
-          </div>
+          />
         );
       case "heading2":
         return (
@@ -352,9 +367,7 @@ export const BlockEditor = ({ pageId, block, index, onFocus }: BlockEditorProps)
             onKeyDown={handleKeyDown}
             onFocus={onFocus}
             data-placeholder="Heading 2"
-          >
-            {block.content}
-          </div>
+          />
         );
       case "heading3":
         return (
@@ -368,9 +381,7 @@ export const BlockEditor = ({ pageId, block, index, onFocus }: BlockEditorProps)
             onKeyDown={handleKeyDown}
             onFocus={onFocus}
             data-placeholder="Heading 3"
-          >
-            {block.content}
-          </div>
+          />
         );
       case "bulleted_list":
         return (
@@ -386,9 +397,7 @@ export const BlockEditor = ({ pageId, block, index, onFocus }: BlockEditorProps)
               onKeyDown={handleKeyDown}
               onFocus={onFocus}
               data-placeholder="List item"
-            >
-              {block.content}
-            </div>
+            />
           </div>
         );
       case "numbered_list":
@@ -405,9 +414,7 @@ export const BlockEditor = ({ pageId, block, index, onFocus }: BlockEditorProps)
               onKeyDown={handleKeyDown}
               onFocus={onFocus}
               data-placeholder="List item"
-            >
-              {block.content}
-            </div>
+            />
           </div>
         );
       case "todo":
@@ -428,9 +435,7 @@ export const BlockEditor = ({ pageId, block, index, onFocus }: BlockEditorProps)
               onKeyDown={handleKeyDown}
               onFocus={onFocus}
               data-placeholder="To-do"
-            >
-              {block.content}
-            </div>
+            />
           </div>
         );
       case "quote":
@@ -446,9 +451,7 @@ export const BlockEditor = ({ pageId, block, index, onFocus }: BlockEditorProps)
               onKeyDown={handleKeyDown}
               onFocus={onFocus}
               data-placeholder="Quote"
-            >
-              {block.content}
-            </div>
+            />
           </div>
         );
       case "divider":
@@ -466,9 +469,7 @@ export const BlockEditor = ({ pageId, block, index, onFocus }: BlockEditorProps)
               onKeyDown={handleKeyDown}
               onFocus={onFocus}
               data-placeholder="// Write your code here..."
-            >
-              {block.content}
-            </div>
+            />
           </div>
         );
       case "callout":
@@ -485,9 +486,7 @@ export const BlockEditor = ({ pageId, block, index, onFocus }: BlockEditorProps)
               onKeyDown={handleKeyDown}
               onFocus={onFocus}
               data-placeholder="Type something..."
-            >
-              {block.content}
-            </div>
+            />
           </div>
         );
       case "toggle":
@@ -507,9 +506,7 @@ export const BlockEditor = ({ pageId, block, index, onFocus }: BlockEditorProps)
                 onKeyDown={handleKeyDown}
                 onFocus={onFocus}
                 data-placeholder="Toggle"
-              >
-                {block.content}
-              </div>
+              />
             </div>
           </div>
         );
@@ -534,9 +531,7 @@ export const BlockEditor = ({ pageId, block, index, onFocus }: BlockEditorProps)
             onKeyDown={handleKeyDown}
             onFocus={onFocus}
             data-placeholder="Type '/' for commands..."
-          >
-            {block.content}
-          </div>
+          />
         );
     }
   };
