@@ -1,70 +1,217 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 import { Sidebar } from "../Sidebar";
-import { ChevronsLeft, ChevronsRight, Sparkles, X, Send, Search, FileText, Database } from "lucide-react";
+import { ChevronsLeft, ChevronsRight, Sparkles, X, Send, Search, Loader2 } from "lucide-react";
 import { useWorkspace } from "../../store";
+
+interface ChatMessage {
+  id: string;
+  role: 'user' | 'ai';
+  content: string;
+  timestamp: Date;
+}
+
+const aiResponses: Record<string, string[]> = {
+  help: [
+    "I can help you with many things! Try asking me about:",
+    "• Creating new pages or databases",
+    "• Organizing your workspace",
+    "• Using keyboard shortcuts",
+    "• Tips for better note-taking",
+  ],
+  page: [
+    "To create a new page:",
+    "1. Click 'New page' in the sidebar",
+    "2. Or use the '/' command in any page",
+    "3. Start typing to add content!",
+  ],
+  shortcut: [
+    "Here are some useful shortcuts:",
+    "• Cmd/Ctrl + K: Quick search",
+    "• Cmd/Ctrl + N: New page",
+    "• /: Open block menu",
+    "• Esc: Close menus",
+  ],
+  database: [
+    "Databases help you organize structured data:",
+    "• Create tables with custom properties",
+    "• Filter and sort your data",
+    "• Use different views like table, board, or list",
+  ],
+  organize: [
+    "Tips for organizing your workspace:",
+    "• Use favorites for quick access",
+    "• Create nested pages for hierarchy",
+    "• Add icons and covers for visual distinction",
+    "• Use tags in databases for categorization",
+  ],
+  default: [
+    "I'm NoteZero AI, your workspace assistant!",
+    "I can help you navigate, organize, and get the most out of NoteZero.",
+    "Try asking about pages, shortcuts, databases, or organization tips!",
+  ],
+};
+
+const getAIResponse = (message: string): string => {
+  const lowerMessage = message.toLowerCase();
+  
+  if (lowerMessage.includes('help') || lowerMessage.includes('what can you do')) {
+    return aiResponses.help.join('\n');
+  }
+  if (lowerMessage.includes('page') || lowerMessage.includes('create') || lowerMessage.includes('new')) {
+    return aiResponses.page.join('\n');
+  }
+  if (lowerMessage.includes('shortcut') || lowerMessage.includes('keyboard') || lowerMessage.includes('hotkey')) {
+    return aiResponses.shortcut.join('\n');
+  }
+  if (lowerMessage.includes('database') || lowerMessage.includes('table') || lowerMessage.includes('data')) {
+    return aiResponses.database.join('\n');
+  }
+  if (lowerMessage.includes('organize') || lowerMessage.includes('structure') || lowerMessage.includes('arrange')) {
+    return aiResponses.organize.join('\n');
+  }
+  
+  return aiResponses.default.join('\n');
+};
 
 const AIChat = ({ onClose }: { onClose: () => void }) => {
   const [message, setMessage] = useState("");
-  const [messages, setMessages] = useState<{ role: 'user' | 'ai'; content: string }[]>([]);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [isTyping, setIsTyping] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const scrollToBottom = useCallback(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, []);
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages, isTyping, scrollToBottom]);
+
+  useEffect(() => {
+    inputRef.current?.focus();
+  }, []);
+
+  const generateId = () => Math.random().toString(36).substr(2, 9);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!message.trim()) return;
+    if (!message.trim() || isTyping) return;
     
-    setMessages(prev => [...prev, { role: 'user', content: message }]);
+    const userMessage: ChatMessage = {
+      id: generateId(),
+      role: 'user',
+      content: message.trim(),
+      timestamp: new Date(),
+    };
+    
+    setMessages(prev => [...prev, userMessage]);
     setMessage("");
+    setIsTyping(true);
+    
+    const typingDelay = 800 + Math.random() * 700;
     
     setTimeout(() => {
-      setMessages(prev => [...prev, { role: 'ai', content: "I'm here to help! This is a demo response from NoteZero AI." }]);
-    }, 500);
+      const aiResponse = getAIResponse(userMessage.content);
+      const aiMessage: ChatMessage = {
+        id: generateId(),
+        role: 'ai',
+        content: aiResponse,
+        timestamp: new Date(),
+      };
+      
+      setMessages(prev => [...prev, aiMessage]);
+      setIsTyping(false);
+    }, typingDelay);
+  };
+
+  const suggestedQuestions = [
+    "What can you help me with?",
+    "How do I create a page?",
+    "Show me keyboard shortcuts",
+  ];
+
+  const handleSuggestionClick = (question: string) => {
+    setMessage(question);
+    inputRef.current?.focus();
   };
 
   return (
-    <div className="fixed bottom-4 right-4 w-80 bg-white rounded-xl shadow-2xl border border-[#e6e4df] z-50 overflow-hidden">
-      <div className="flex items-center justify-between px-4 py-3 border-b border-[#e6e4df] bg-[#f7f6f3]">
+    <div className="fixed bottom-4 right-4 w-80 bg-white rounded-xl shadow-2xl border border-[#e6e4df] z-50 overflow-hidden flex flex-col max-h-[480px]">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-[#e6e4df] bg-[#f7f6f3] flex-shrink-0">
         <div className="flex items-center gap-2">
-          <Sparkles className="w-4 h-4 text-[#9b9a97]" />
+          <Sparkles className="w-4 h-4 text-[#2383e2]" />
           <span className="text-sm font-medium text-[#37352f]">NoteZero AI</span>
         </div>
-        <button onClick={onClose} className="text-[#9b9a97] hover:text-[#37352f]">
+        <button 
+          onClick={onClose} 
+          className="text-[#9b9a97] hover:text-[#37352f] transition-colors p-1 rounded hover:bg-[#e6e4df]"
+        >
           <X className="w-4 h-4" />
         </button>
       </div>
       
-      <div className="h-64 overflow-y-auto p-4 space-y-3">
+      <div className="flex-1 overflow-y-auto p-4 space-y-3 min-h-[200px]">
         {messages.length === 0 ? (
-          <div className="text-center text-sm text-[#9b9a97] py-8">
-            <Sparkles className="w-8 h-8 mx-auto mb-2 text-[#9b9a97]" />
-            <p>Your improved NoteZero AI</p>
-            <p className="text-xs mt-2">Here are a few things I can do, or ask me anything!</p>
+          <div className="text-center py-4">
+            <Sparkles className="w-8 h-8 mx-auto mb-3 text-[#2383e2]" />
+            <p className="text-sm font-medium text-[#37352f] mb-1">NoteZero AI Assistant</p>
+            <p className="text-xs text-[#9b9a97] mb-4">Ask me anything about your workspace!</p>
+            
+            <div className="space-y-2">
+              {suggestedQuestions.map((question, i) => (
+                <button
+                  key={i}
+                  onClick={() => handleSuggestionClick(question)}
+                  className="w-full text-left px-3 py-2 text-xs text-[#37352f] bg-[#f7f6f3] rounded-lg hover:bg-[#efefec] transition-colors"
+                >
+                  {question}
+                </button>
+              ))}
+            </div>
           </div>
         ) : (
-          messages.map((msg, i) => (
-            <div key={i} className={`text-sm ${msg.role === 'user' ? 'text-right' : 'text-left'}`}>
-              <span className={`inline-block px-3 py-2 rounded-lg ${
-                msg.role === 'user' ? 'bg-[#2383e2] text-white' : 'bg-[#f7f6f3] text-[#37352f]'
-              }`}>
-                {msg.content}
-              </span>
-            </div>
-          ))
+          <>
+            {messages.map((msg) => (
+              <div key={msg.id} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                <div className={`max-w-[85%] px-3 py-2 rounded-lg text-sm whitespace-pre-line ${
+                  msg.role === 'user' 
+                    ? 'bg-[#2383e2] text-white' 
+                    : 'bg-[#f7f6f3] text-[#37352f]'
+                }`}>
+                  {msg.content}
+                </div>
+              </div>
+            ))}
+            {isTyping && (
+              <div className="flex justify-start">
+                <div className="bg-[#f7f6f3] text-[#37352f] px-3 py-2 rounded-lg flex items-center gap-2">
+                  <Loader2 className="w-3 h-3 animate-spin text-[#9b9a97]" />
+                  <span className="text-xs text-[#9b9a97]">Thinking...</span>
+                </div>
+              </div>
+            )}
+            <div ref={messagesEndRef} />
+          </>
         )}
       </div>
 
-      <form onSubmit={handleSubmit} className="p-3 border-t border-[#e6e4df]">
+      <form onSubmit={handleSubmit} className="p-3 border-t border-[#e6e4df] bg-white flex-shrink-0">
         <div className="flex items-center gap-2">
           <input
+            ref={inputRef}
             type="text"
             value={message}
             onChange={(e) => setMessage(e.target.value)}
-            placeholder="Ask, search, or make anything..."
-            className="flex-1 px-3 py-2 text-sm border border-[#e6e4df] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2383e2]"
+            placeholder="Ask anything..."
+            disabled={isTyping}
+            className="flex-1 px-3 py-2 text-sm border border-[#e6e4df] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2383e2] focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
           />
           <button
             type="submit"
-            disabled={!message.trim()}
-            className="w-8 h-8 bg-[#2383e2] text-white rounded-lg flex items-center justify-center disabled:opacity-50"
+            disabled={!message.trim() || isTyping}
+            className="w-8 h-8 bg-[#2383e2] text-white rounded-lg flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed hover:bg-[#1a6bc2] transition-colors"
           >
             <Send className="w-4 h-4" />
           </button>
@@ -130,7 +277,7 @@ const GlobalSearch = ({ onClose }: { onClose: () => void }) => {
                 <button
                   key={page.id}
                   onClick={() => handleSelect('page', page.id)}
-                  className="w-full flex items-center gap-2 px-2 py-2 rounded-md hover:bg-[#f7f6f3] text-left"
+                  className="w-full flex items-center gap-2 px-2 py-2 rounded-md hover:bg-[#f7f6f3] text-left transition-colors"
                 >
                   <span className="text-base">{page.icon || '📄'}</span>
                   <span className="text-sm text-[#37352f]">{page.title}</span>
@@ -146,7 +293,7 @@ const GlobalSearch = ({ onClose }: { onClose: () => void }) => {
                 <button
                   key={db.id}
                   onClick={() => handleSelect('database', db.id)}
-                  className="w-full flex items-center gap-2 px-2 py-2 rounded-md hover:bg-[#f7f6f3] text-left"
+                  className="w-full flex items-center gap-2 px-2 py-2 rounded-md hover:bg-[#f7f6f3] text-left transition-colors"
                 >
                   <span className="text-base">{db.icon || '📋'}</span>
                   <span className="text-sm text-[#37352f]">{db.name}</span>
@@ -199,12 +346,14 @@ export const Layout = (): JSX.Element => {
         <Outlet />
       </main>
 
-      <button
-        onClick={() => setShowAIChat(!showAIChat)}
-        className="fixed bottom-4 right-4 w-12 h-12 bg-white rounded-full shadow-lg border border-[#e6e4df] flex items-center justify-center hover:bg-[#f7f6f3] transition-colors z-40"
-      >
-        <Sparkles className="w-5 h-5 text-[#9b9a97]" />
-      </button>
+      {!showAIChat && (
+        <button
+          onClick={() => setShowAIChat(true)}
+          className="fixed bottom-4 right-4 w-12 h-12 bg-[#2383e2] text-white rounded-full shadow-lg flex items-center justify-center hover:bg-[#1a6bc2] transition-all z-40 hover:scale-105"
+        >
+          <Sparkles className="w-5 h-5" />
+        </button>
+      )}
 
       {showAIChat && <AIChat onClose={() => setShowAIChat(false)} />}
       {showSearch && <GlobalSearch onClose={() => setShowSearch(false)} />}

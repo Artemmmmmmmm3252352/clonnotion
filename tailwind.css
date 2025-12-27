@@ -199,3 +199,33 @@
     text-rendering: optimizeLegibility;
   }
 }
+
+.block-editable {
+  direction: ltr !important;
+  unicode-bidi: plaintext !important;
+  text-align: left !important;
+  caret-color: #37352f;
+}
+
+.block-editable:empty::before {
+  content: attr(data-placeholder);
+  color: #9b9a97;
+  pointer-events: none;
+  position: absolute;
+  opacity: 0.6;
+}
+
+.block-editable:focus:empty::before {
+  opacity: 0.4;
+}
+
+.block-editable:focus {
+  outline: none;
+}
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
