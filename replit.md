@@ -1,7 +1,7 @@
 # NoteZero - Notion Clone
 
 ## Overview
-A Notion-like workspace application with project management, task tracking, and note-taking capabilities.
+A Notion-like workspace application with block-based page editing, hierarchical page navigation, databases, and global search.
 
 ## Tech Stack
 - React 18
@@ -16,31 +16,36 @@ A Notion-like workspace application with project management, task tracking, and 
 src/
   components/
     Layout/          - Main layout with sidebar
-    Sidebar/         - Navigation sidebar
-    ui/              - Reusable UI components (badge, button, card, checkbox, input, select)
+    Sidebar/         - Dynamic navigation with page tree
+    Editor/          - Block-based content editor
+    ui/              - Reusable UI components
   lib/               - Utility functions
+  store/             - WorkspaceContext for state management
+    types.ts         - Type definitions (Page, Block, Database, etc.)
+    WorkspaceContext - Context provider with CRUD operations
   pages/
     Home/            - Home page with recent pages and favorites
-    Projects/        - Project cards with progress tracking
-    TasksDB/         - Tasks database table view
-    NotesDB/         - Notes database with tags
-    Archive/         - Archived items with restore/delete
-  screens/           - Legacy Figma import (not in use)
-public/              - Static assets (images, backgrounds)
+    PageEditor/      - Block-based page editor with slash commands
+    Search/          - Global search across pages and databases
+public/              - Static assets
 ```
 
-## Pages
-- **Home** (`/`) - Welcome page with recent pages and favorites
-- **Projects** (`/projects`) - Project cards with progress bars
-- **Tasks DB** (`/tasks`) - Task database with status, priority, and due dates
-- **Notes DB** (`/notes`) - Notes with tags and authors
-- **Archive** (`/archive`) - Archived items management
+## Core Features
+- **Block Editor**: 9 block types (text, h1-h3, lists, todo, quote, divider)
+- **Slash Commands**: Type "/" to open block type menu
+- **Page Tree**: Hierarchical pages with expand/collapse
+- **Favorites**: Star pages to pin in sidebar
+- **Databases**: Table view with typed properties
+- **Global Search**: Search pages, blocks, and database records
+
+## Routes
+- `/` - Home with quick access cards
+- `/page/:pageId` - Block-based page editor
+- `/search` - Global search page
 
 ## Development
-- Dev server: `npm run dev` (runs on port 5000)
+- Dev server: `npm run dev` (port 5000)
 - Build: `npm run build` (outputs to dist/)
 
 ## Deployment
-Configured for static deployment with:
-- Build command: `npm run build`
-- Public directory: `dist`
+Static deployment with build command and dist/ directory
