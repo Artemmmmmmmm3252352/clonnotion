@@ -1,8 +1,118 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { ChevronRight, Plus, Star, MoreHorizontal, Home, FileText, Database, Archive, Search } from "lucide-react";
+import { ChevronRight, Plus, Star, MoreHorizontal, Home, FileText, Database, Trash2, Search, Copy, Edit2, FolderInput } from "lucide-react";
 import { useWorkspace } from "../../store";
 import { Page } from "../../store/types";
+
+interface PageMenuProps {
+  page: Page;
+  onClose: () => void;
+  position: { x: number; y: number };
+}
+
+const PageMenu = ({ page, onClose, position }: PageMenuProps) => {
+  const { deletePage, duplicatePage, toggleFavorite, updatePage } = useWorkspace();
+  const navigate = useNavigate();
+  const menuRef = useRef<HTMLDivElement>(null);
+  const [isRenaming, setIsRenaming] = useState(false);
+  const [newTitle, setNewTitle] = useState(page.title);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        onClose();
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [onClose]);
+
+  const handleRename = () => {
+    if (newTitle.trim()) {
+      updatePage(page.id, { title: newTitle.trim() });
+    }
+    setIsRenaming(false);
+    onClose();
+  };
+
+  const handleDuplicate = () => {
+    const newPage = duplicatePage(page.id);
+    if (newPage) {
+      navigate(`/page/${newPage.id}`);
+    }
+    onClose();
+  };
+
+  const handleDelete = () => {
+    deletePage(page.id);
+    navigate("/");
+    onClose();
+  };
+
+  const handleFavorite = () => {
+    toggleFavorite(page.id);
+    onClose();
+  };
+
+  if (isRenaming) {
+    return (
+      <div
+        ref={menuRef}
+        className="fixed z-50 bg-white rounded-lg shadow-lg border border-[#e6e4df] p-2 min-w-[200px]"
+        style={{ left: position.x, top: position.y }}
+      >
+        <input
+          autoFocus
+          value={newTitle}
+          onChange={(e) => setNewTitle(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") handleRename();
+            if (e.key === "Escape") onClose();
+          }}
+          className="w-full px-2 py-1 text-sm border border-[#e6e4df] rounded focus:outline-none focus:ring-2 focus:ring-[#2383e2]"
+        />
+      </div>
+    );
+  }
+
+  return (
+    <div
+      ref={menuRef}
+      className="fixed z-50 bg-white rounded-lg shadow-lg border border-[#e6e4df] py-1 min-w-[160px]"
+      style={{ left: position.x, top: position.y }}
+    >
+      <button
+        onClick={() => setIsRenaming(true)}
+        className="w-full flex items-center gap-2 px-3 py-1.5 text-sm text-[#37352f] hover:bg-[#efefec] text-left"
+      >
+        <Edit2 className="w-4 h-4" />
+        Rename
+      </button>
+      <button
+        onClick={handleDuplicate}
+        className="w-full flex items-center gap-2 px-3 py-1.5 text-sm text-[#37352f] hover:bg-[#efefec] text-left"
+      >
+        <Copy className="w-4 h-4" />
+        Duplicate
+      </button>
+      <button
+        onClick={handleFavorite}
+        className="w-full flex items-center gap-2 px-3 py-1.5 text-sm text-[#37352f] hover:bg-[#efefec] text-left"
+      >
+        <Star className={`w-4 h-4 ${page.isFavorite ? "fill-[#f5c518] text-[#f5c518]" : ""}`} />
+        {page.isFavorite ? "Remove from favorites" : "Add to favorites"}
+      </button>
+      <div className="h-px bg-[#e6e4df] my-1" />
+      <button
+        onClick={handleDelete}
+        className="w-full flex items-center gap-2 px-3 py-1.5 text-sm text-[#eb5757] hover:bg-[#efefec] text-left"
+      >
+        <Trash2 className="w-4 h-4" />
+        Delete
+      </button>
+    </div>
+  );
+};
 
 interface PageItemProps {
   page: Page;
@@ -12,6 +122,7 @@ interface PageItemProps {
 const PageItem = ({ page, level }: PageItemProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+  const [menuPosition, setMenuPosition] = useState<{ x: number; y: number } | null>(null);
   const { currentPageId, setCurrentPageId, getChildPages, toggleFavorite } = useWorkspace();
   const navigate = useNavigate();
   
@@ -22,6 +133,12 @@ const PageItem = ({ page, level }: PageItemProps) => {
   const handleClick = () => {
     setCurrentPageId(page.id);
     navigate(`/page/${page.id}`);
+  };
+
+  const handleMenuClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const rect = (e.target as HTMLElement).getBoundingClientRect();
+    setMenuPosition({ x: rect.right + 4, y: rect.top });
   };
 
   return (
@@ -61,12 +178,23 @@ const PageItem = ({ page, level }: PageItemProps) => {
             >
               <Star className={`w-3 h-3 ${page.isFavorite ? "fill-[#f5c518] text-[#f5c518]" : "text-[#9b9a97]"}`} />
             </button>
-            <button className="w-5 h-5 flex items-center justify-center rounded hover:bg-[#ddd]">
+            <button 
+              className="w-5 h-5 flex items-center justify-center rounded hover:bg-[#ddd]"
+              onClick={handleMenuClick}
+            >
               <MoreHorizontal className="w-3 h-3 text-[#9b9a97]" />
             </button>
           </div>
         )}
       </div>
+      
+      {menuPosition && (
+        <PageMenu
+          page={page}
+          position={menuPosition}
+          onClose={() => setMenuPosition(null)}
+        />
+      )}
       
       {isExpanded && hasChildren && (
         <div>
@@ -82,10 +210,11 @@ const PageItem = ({ page, level }: PageItemProps) => {
 export const Sidebar = (): JSX.Element => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { workspace, getRootPages, getFavoritePages, createPage, setCurrentPageId } = useWorkspace();
+  const { workspace, getRootPages, getFavoritePages, getArchivedPages, createPage, setCurrentPageId } = useWorkspace();
   
   const rootPages = getRootPages();
   const favoritePages = getFavoritePages();
+  const archivedPages = getArchivedPages();
 
   const handleCreatePage = () => {
     const newPage = createPage("Untitled");
@@ -158,7 +287,7 @@ export const Sidebar = (): JSX.Element => {
           </div>
         </div>
 
-        <div>
+        <div className="mb-4">
           <div className="px-4 py-1">
             <span className="text-[11px] text-[#9b9a97] font-medium uppercase tracking-wide">
               Databases
@@ -177,6 +306,27 @@ export const Sidebar = (): JSX.Element => {
             ))}
           </div>
         </div>
+
+        {archivedPages.length > 0 && (
+          <div>
+            <div className="px-4 py-1">
+              <span className="text-[11px] text-[#9b9a97] font-medium uppercase tracking-wide">
+                Trash
+              </span>
+            </div>
+            <div className="px-2">
+              <button
+                onClick={() => navigate("/trash")}
+                className={`w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-left transition-colors ${
+                  location.pathname === "/trash" ? "bg-[#efefec]" : "hover:bg-[#efefec]"
+                }`}
+              >
+                <Trash2 className="w-4 h-4 text-[#9b9a97]" />
+                <span className="text-sm text-[#37352f]">Trash ({archivedPages.length})</span>
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="px-2 py-3 border-t border-[#e6e4df]">

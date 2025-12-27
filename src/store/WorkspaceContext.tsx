@@ -108,14 +108,21 @@ interface WorkspaceContextType {
   createPage: (title: string, parentId?: string | null) => Page;
   updatePage: (id: string, updates: Partial<Page>) => void;
   deletePage: (id: string) => void;
+  duplicatePage: (id: string) => Page | null;
+  restorePage: (id: string) => void;
+  permanentlyDeletePage: (id: string) => void;
+  movePage: (id: string, newParentId: string | null) => void;
   toggleFavorite: (id: string) => void;
   addBlock: (pageId: string, block: Omit<Block, 'id'>, afterBlockId?: string) => void;
   updateBlock: (pageId: string, blockId: string, updates: Partial<Block>) => void;
   deleteBlock: (pageId: string, blockId: string) => void;
+  duplicateBlock: (pageId: string, blockId: string) => void;
+  moveBlock: (pageId: string, blockId: string, newIndex: number) => void;
   getPage: (id: string) => Page | undefined;
   getRootPages: () => Page[];
   getChildPages: (parentId: string) => Page[];
   getFavoritePages: () => Page[];
+  getArchivedPages: () => Page[];
 }
 
 const WorkspaceContext = createContext<WorkspaceContextType | null>(null);
@@ -164,6 +171,51 @@ export const WorkspaceProvider = ({ children }: { children: ReactNode }) => {
       ...prev,
       pages: prev.pages.map(page =>
         page.id === id ? { ...page, isArchived: true } : page
+      ),
+    }));
+  }, []);
+
+  const duplicatePage = useCallback((id: string): Page | null => {
+    const page = workspace.pages.find(p => p.id === id);
+    if (!page) return null;
+    
+    const newPage: Page = {
+      ...page,
+      id: generateId(),
+      title: `${page.title} (copy)`,
+      blocks: page.blocks.map(block => ({ ...block, id: generateId() })),
+      isFavorite: false,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    setWorkspace(prev => ({
+      ...prev,
+      pages: [...prev.pages, newPage],
+    }));
+    return newPage;
+  }, [workspace.pages]);
+
+  const restorePage = useCallback((id: string) => {
+    setWorkspace(prev => ({
+      ...prev,
+      pages: prev.pages.map(page =>
+        page.id === id ? { ...page, isArchived: false } : page
+      ),
+    }));
+  }, []);
+
+  const permanentlyDeletePage = useCallback((id: string) => {
+    setWorkspace(prev => ({
+      ...prev,
+      pages: prev.pages.filter(page => page.id !== id),
+    }));
+  }, []);
+
+  const movePage = useCallback((id: string, newParentId: string | null) => {
+    setWorkspace(prev => ({
+      ...prev,
+      pages: prev.pages.map(page =>
+        page.id === id ? { ...page, parentId: newParentId, updatedAt: new Date() } : page
       ),
     }));
   }, []);
@@ -225,6 +277,37 @@ export const WorkspaceProvider = ({ children }: { children: ReactNode }) => {
     }));
   }, []);
 
+  const duplicateBlock = useCallback((pageId: string, blockId: string) => {
+    setWorkspace(prev => ({
+      ...prev,
+      pages: prev.pages.map(page => {
+        if (page.id !== pageId) return page;
+        const index = page.blocks.findIndex(b => b.id === blockId);
+        if (index === -1) return page;
+        const block = page.blocks[index];
+        const newBlock = { ...block, id: generateId() };
+        const blocks = [...page.blocks];
+        blocks.splice(index + 1, 0, newBlock);
+        return { ...page, blocks, updatedAt: new Date() };
+      }),
+    }));
+  }, []);
+
+  const moveBlock = useCallback((pageId: string, blockId: string, newIndex: number) => {
+    setWorkspace(prev => ({
+      ...prev,
+      pages: prev.pages.map(page => {
+        if (page.id !== pageId) return page;
+        const blocks = [...page.blocks];
+        const oldIndex = blocks.findIndex(b => b.id === blockId);
+        if (oldIndex === -1) return page;
+        const [block] = blocks.splice(oldIndex, 1);
+        blocks.splice(newIndex, 0, block);
+        return { ...page, blocks, updatedAt: new Date() };
+      }),
+    }));
+  }, []);
+
   const getPage = useCallback((id: string) => {
     return workspace.pages.find(page => page.id === id);
   }, [workspace.pages]);
@@ -241,6 +324,10 @@ export const WorkspaceProvider = ({ children }: { children: ReactNode }) => {
     return workspace.pages.filter(page => page.isFavorite && !page.isArchived);
   }, [workspace.pages]);
 
+  const getArchivedPages = useCallback(() => {
+    return workspace.pages.filter(page => page.isArchived);
+  }, [workspace.pages]);
+
   return (
     <WorkspaceContext.Provider value={{
       workspace,
@@ -249,14 +336,21 @@ export const WorkspaceProvider = ({ children }: { children: ReactNode }) => {
       createPage,
       updatePage,
       deletePage,
+      duplicatePage,
+      restorePage,
+      permanentlyDeletePage,
+      movePage,
       toggleFavorite,
       addBlock,
       updateBlock,
       deleteBlock,
+      duplicateBlock,
+      moveBlock,
       getPage,
       getRootPages,
       getChildPages,
       getFavoritePages,
+      getArchivedPages,
     }}>
       {children}
     </WorkspaceContext.Provider>

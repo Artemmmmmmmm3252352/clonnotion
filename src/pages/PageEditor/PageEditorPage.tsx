@@ -128,11 +128,12 @@ export const PageEditorPage = (): JSX.Element => {
           </div>
 
           <div className="space-y-1">
-            {page.blocks.map((block) => (
+            {page.blocks.map((block, index) => (
               <BlockEditor
                 key={block.id}
                 pageId={page.id}
                 block={block}
+                index={index}
               />
             ))}
           </div>

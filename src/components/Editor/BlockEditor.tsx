@@ -1,5 +1,5 @@
-import React, { useState, useRef, KeyboardEvent } from "react";
-import { GripVertical, Plus, Trash2 } from "lucide-react";
+import React, { useState, useRef, useEffect, KeyboardEvent } from "react";
+import { GripVertical, Plus, Trash2, Copy, Type, Palette, MoreHorizontal, ChevronRight } from "lucide-react";
 import { Block, BlockType } from "../../store/types";
 import { useWorkspace } from "../../store";
 import { Checkbox } from "../ui/checkbox";
@@ -7,6 +7,7 @@ import { Checkbox } from "../ui/checkbox";
 interface BlockEditorProps {
   pageId: string;
   block: Block;
+  index: number;
   onFocus?: () => void;
 }
 
@@ -22,6 +23,19 @@ const blockTypeLabels: Record<BlockType, string> = {
   divider: "Divider",
   page: "Page",
 };
+
+const blockColors = [
+  { id: "default", label: "Default", bg: "", text: "" },
+  { id: "gray", label: "Gray", bg: "bg-[#f1f1ef]", text: "text-[#787774]" },
+  { id: "brown", label: "Brown", bg: "bg-[#f4eeee]", text: "text-[#9f6b53]" },
+  { id: "orange", label: "Orange", bg: "bg-[#fbecdd]", text: "text-[#d9730d]" },
+  { id: "yellow", label: "Yellow", bg: "bg-[#fbf3db]", text: "text-[#cb912f]" },
+  { id: "green", label: "Green", bg: "bg-[#edf3ec]", text: "text-[#448361]" },
+  { id: "blue", label: "Blue", bg: "bg-[#e7f3f8]", text: "text-[#337ea9]" },
+  { id: "purple", label: "Purple", bg: "bg-[#f6f3f9]", text: "text-[#9065b0]" },
+  { id: "pink", label: "Pink", bg: "bg-[#faf1f5]", text: "text-[#c14c8a]" },
+  { id: "red", label: "Red", bg: "bg-[#fdebec]", text: "text-[#d44c47]" },
+];
 
 const SlashMenu = ({ 
   onSelect, 
@@ -65,12 +79,154 @@ const SlashMenu = ({
   );
 };
 
-export const BlockEditor = ({ pageId, block, onFocus }: BlockEditorProps) => {
-  const { updateBlock, deleteBlock, addBlock } = useWorkspace();
+interface BlockMenuProps {
+  pageId: string;
+  block: Block;
+  onClose: () => void;
+  position: { x: number; y: number };
+}
+
+const BlockMenu = ({ pageId, block, onClose, position }: BlockMenuProps) => {
+  const { deleteBlock, duplicateBlock, updateBlock } = useWorkspace();
+  const menuRef = useRef<HTMLDivElement>(null);
+  const [showTurnInto, setShowTurnInto] = useState(false);
+  const [showColors, setShowColors] = useState(false);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        onClose();
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [onClose]);
+
+  const handleDuplicate = () => {
+    duplicateBlock(pageId, block.id);
+    onClose();
+  };
+
+  const handleDelete = () => {
+    deleteBlock(pageId, block.id);
+    onClose();
+  };
+
+  const handleTurnInto = (type: BlockType) => {
+    updateBlock(pageId, block.id, { type });
+    setShowTurnInto(false);
+    onClose();
+  };
+
+  const handleColorChange = (colorId: string) => {
+    const color = blockColors.find(c => c.id === colorId);
+    if (color) {
+      updateBlock(pageId, block.id, { color: colorId });
+    }
+    setShowColors(false);
+    onClose();
+  };
+
+  const types: BlockType[] = [
+    "text", "heading1", "heading2", "heading3",
+    "bulleted_list", "numbered_list", "todo", "quote", "divider"
+  ];
+
+  return (
+    <div
+      ref={menuRef}
+      className="fixed z-50 bg-white rounded-lg shadow-lg border border-[#e6e4df] py-1 min-w-[200px]"
+      style={{ left: position.x, top: position.y }}
+    >
+      <button
+        onClick={handleDuplicate}
+        className="w-full flex items-center gap-2 px-3 py-1.5 text-sm text-[#37352f] hover:bg-[#efefec] text-left"
+      >
+        <Copy className="w-4 h-4" />
+        Duplicate
+      </button>
+      
+      <div className="relative">
+        <button
+          onMouseEnter={() => { setShowTurnInto(true); setShowColors(false); }}
+          className="w-full flex items-center justify-between px-3 py-1.5 text-sm text-[#37352f] hover:bg-[#efefec] text-left"
+        >
+          <div className="flex items-center gap-2">
+            <Type className="w-4 h-4" />
+            Turn into
+          </div>
+          <ChevronRight className="w-4 h-4" />
+        </button>
+        
+        {showTurnInto && (
+          <div className="absolute left-full top-0 ml-1 bg-white rounded-lg shadow-lg border border-[#e6e4df] py-1 min-w-[160px]">
+            {types.map(type => (
+              <button
+                key={type}
+                onClick={() => handleTurnInto(type)}
+                className={`w-full px-3 py-1.5 text-sm text-left hover:bg-[#efefec] ${
+                  block.type === type ? "bg-[#efefec] text-[#2383e2]" : "text-[#37352f]"
+                }`}
+              >
+                {blockTypeLabels[type]}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+      
+      <div className="relative">
+        <button
+          onMouseEnter={() => { setShowColors(true); setShowTurnInto(false); }}
+          className="w-full flex items-center justify-between px-3 py-1.5 text-sm text-[#37352f] hover:bg-[#efefec] text-left"
+        >
+          <div className="flex items-center gap-2">
+            <Palette className="w-4 h-4" />
+            Color
+          </div>
+          <ChevronRight className="w-4 h-4" />
+        </button>
+        
+        {showColors && (
+          <div className="absolute left-full top-0 ml-1 bg-white rounded-lg shadow-lg border border-[#e6e4df] py-1 min-w-[140px]">
+            {blockColors.map(color => (
+              <button
+                key={color.id}
+                onClick={() => handleColorChange(color.id)}
+                className={`w-full px-3 py-1.5 text-sm text-left hover:bg-[#efefec] flex items-center gap-2 ${
+                  block.color === color.id ? "bg-[#efefec]" : ""
+                }`}
+              >
+                <div className={`w-4 h-4 rounded ${color.bg || "border border-[#e6e4df]"}`} />
+                <span className={color.text || "text-[#37352f]"}>{color.label}</span>
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+      
+      <div className="h-px bg-[#e6e4df] my-1" />
+      
+      <button
+        onClick={handleDelete}
+        className="w-full flex items-center gap-2 px-3 py-1.5 text-sm text-[#eb5757] hover:bg-[#efefec] text-left"
+      >
+        <Trash2 className="w-4 h-4" />
+        Delete
+      </button>
+    </div>
+  );
+};
+
+export const BlockEditor = ({ pageId, block, index, onFocus }: BlockEditorProps) => {
+  const { updateBlock, deleteBlock, addBlock, moveBlock } = useWorkspace();
   const [isHovered, setIsHovered] = useState(false);
   const [showSlashMenu, setShowSlashMenu] = useState(false);
   const [slashFilter, setSlashFilter] = useState("");
+  const [menuPosition, setMenuPosition] = useState<{ x: number; y: number } | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
+  const blockRef = useRef<HTMLDivElement>(null);
 
   const handleInput = () => {
     if (contentRef.current) {
@@ -125,8 +281,41 @@ export const BlockEditor = ({ pageId, block, onFocus }: BlockEditorProps) => {
     updateBlock(pageId, block.id, { checked });
   };
 
+  const handleMenuClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const rect = (e.target as HTMLElement).getBoundingClientRect();
+    setMenuPosition({ x: rect.left, y: rect.bottom + 4 });
+  };
+
+  const handleDragStart = (e: React.DragEvent) => {
+    setIsDragging(true);
+    e.dataTransfer.setData("text/plain", JSON.stringify({ blockId: block.id, index }));
+    e.dataTransfer.effectAllowed = "move";
+  };
+
+  const handleDragEnd = () => {
+    setIsDragging(false);
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    const data = JSON.parse(e.dataTransfer.getData("text/plain"));
+    if (data.blockId !== block.id) {
+      moveBlock(pageId, data.blockId, index);
+    }
+  };
+
+  const colorClass = block.color && block.color !== "default" ? blockColors.find(c => c.id === block.color) : null;
+  const bgClass = colorClass?.bg || "";
+  const textColorClass = colorClass?.text || "text-[#37352f]";
+
   const renderBlockContent = () => {
-    const baseClass = "outline-none min-h-[1.5em] w-full";
+    const baseClass = `outline-none min-h-[1.5em] w-full`;
     
     switch (block.type) {
       case "heading1":
@@ -135,7 +324,7 @@ export const BlockEditor = ({ pageId, block, onFocus }: BlockEditorProps) => {
             ref={contentRef}
             contentEditable
             suppressContentEditableWarning
-            className={`${baseClass} text-3xl font-bold text-[#37352f]`}
+            className={`${baseClass} text-3xl font-bold ${textColorClass}`}
             onInput={handleInput}
             onKeyDown={handleKeyDown}
             onFocus={onFocus}
@@ -150,7 +339,7 @@ export const BlockEditor = ({ pageId, block, onFocus }: BlockEditorProps) => {
             ref={contentRef}
             contentEditable
             suppressContentEditableWarning
-            className={`${baseClass} text-2xl font-semibold text-[#37352f]`}
+            className={`${baseClass} text-2xl font-semibold ${textColorClass}`}
             onInput={handleInput}
             onKeyDown={handleKeyDown}
             onFocus={onFocus}
@@ -165,7 +354,7 @@ export const BlockEditor = ({ pageId, block, onFocus }: BlockEditorProps) => {
             ref={contentRef}
             contentEditable
             suppressContentEditableWarning
-            className={`${baseClass} text-xl font-medium text-[#37352f]`}
+            className={`${baseClass} text-xl font-medium ${textColorClass}`}
             onInput={handleInput}
             onKeyDown={handleKeyDown}
             onFocus={onFocus}
@@ -177,12 +366,12 @@ export const BlockEditor = ({ pageId, block, onFocus }: BlockEditorProps) => {
       case "bulleted_list":
         return (
           <div className="flex gap-2">
-            <span className="text-[#37352f] mt-0.5">•</span>
+            <span className={`mt-0.5 ${textColorClass}`}>•</span>
             <div
               ref={contentRef}
               contentEditable
               suppressContentEditableWarning
-              className={`${baseClass} text-[15px] text-[#37352f]`}
+              className={`${baseClass} text-[15px] ${textColorClass}`}
               onInput={handleInput}
               onKeyDown={handleKeyDown}
               onFocus={onFocus}
@@ -195,12 +384,12 @@ export const BlockEditor = ({ pageId, block, onFocus }: BlockEditorProps) => {
       case "numbered_list":
         return (
           <div className="flex gap-2">
-            <span className="text-[#37352f] mt-0.5">1.</span>
+            <span className={`mt-0.5 ${textColorClass}`}>1.</span>
             <div
               ref={contentRef}
               contentEditable
               suppressContentEditableWarning
-              className={`${baseClass} text-[15px] text-[#37352f]`}
+              className={`${baseClass} text-[15px] ${textColorClass}`}
               onInput={handleInput}
               onKeyDown={handleKeyDown}
               onFocus={onFocus}
@@ -222,7 +411,7 @@ export const BlockEditor = ({ pageId, block, onFocus }: BlockEditorProps) => {
               ref={contentRef}
               contentEditable
               suppressContentEditableWarning
-              className={`${baseClass} text-[15px] ${block.checked ? "line-through text-[#9b9a97]" : "text-[#37352f]"}`}
+              className={`${baseClass} text-[15px] ${block.checked ? "line-through text-[#9b9a97]" : textColorClass}`}
               onInput={handleInput}
               onKeyDown={handleKeyDown}
               onFocus={onFocus}
@@ -239,7 +428,7 @@ export const BlockEditor = ({ pageId, block, onFocus }: BlockEditorProps) => {
               ref={contentRef}
               contentEditable
               suppressContentEditableWarning
-              className={`${baseClass} text-[15px] text-[#37352f] italic`}
+              className={`${baseClass} text-[15px] italic ${textColorClass}`}
               onInput={handleInput}
               onKeyDown={handleKeyDown}
               onFocus={onFocus}
@@ -257,7 +446,7 @@ export const BlockEditor = ({ pageId, block, onFocus }: BlockEditorProps) => {
             ref={contentRef}
             contentEditable
             suppressContentEditableWarning
-            className={`${baseClass} text-[15px] text-[#37352f]`}
+            className={`${baseClass} text-[15px] ${textColorClass}`}
             onInput={handleInput}
             onKeyDown={handleKeyDown}
             onFocus={onFocus}
@@ -271,9 +460,12 @@ export const BlockEditor = ({ pageId, block, onFocus }: BlockEditorProps) => {
 
   return (
     <div
-      className="relative group flex items-start gap-1 py-1"
+      ref={blockRef}
+      className={`relative group flex items-start gap-1 py-1 rounded ${bgClass} ${isDragging ? "opacity-50" : ""}`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      onDragOver={handleDragOver}
+      onDrop={handleDrop}
     >
       <div className={`flex items-center gap-0.5 transition-opacity ${isHovered ? "opacity-100" : "opacity-0"}`}>
         <button
@@ -282,12 +474,18 @@ export const BlockEditor = ({ pageId, block, onFocus }: BlockEditorProps) => {
         >
           <Plus className="w-4 h-4 text-[#9b9a97]" />
         </button>
-        <button className="w-6 h-6 flex items-center justify-center rounded hover:bg-[#efefec] cursor-grab">
+        <button 
+          className="w-6 h-6 flex items-center justify-center rounded hover:bg-[#efefec] cursor-grab active:cursor-grabbing"
+          draggable
+          onDragStart={handleDragStart}
+          onDragEnd={handleDragEnd}
+          onClick={handleMenuClick}
+        >
           <GripVertical className="w-4 h-4 text-[#9b9a97]" />
         </button>
       </div>
       
-      <div className="flex-1 relative">
+      <div className="flex-1 relative px-1">
         {renderBlockContent()}
         {showSlashMenu && (
           <SlashMenu
@@ -298,13 +496,13 @@ export const BlockEditor = ({ pageId, block, onFocus }: BlockEditorProps) => {
         )}
       </div>
 
-      {isHovered && block.type !== "text" && (
-        <button
-          className="w-6 h-6 flex items-center justify-center rounded hover:bg-[#ffd4d4]"
-          onClick={() => deleteBlock(pageId, block.id)}
-        >
-          <Trash2 className="w-4 h-4 text-[#9b9a97]" />
-        </button>
+      {menuPosition && (
+        <BlockMenu
+          pageId={pageId}
+          block={block}
+          position={menuPosition}
+          onClose={() => setMenuPosition(null)}
+        />
       )}
     </div>
   );

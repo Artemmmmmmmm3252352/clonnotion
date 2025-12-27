@@ -15,6 +15,7 @@ export interface Block {
   type: BlockType;
   content: string;
   checked?: boolean;
+  color?: string;
   children?: string[];
 }
 

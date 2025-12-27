@@ -6,6 +6,8 @@ import { Layout } from "./components/Layout";
 import { HomePage } from "./pages/Home";
 import { PageEditorPage } from "./pages/PageEditor";
 import { SearchPage } from "./pages/Search";
+import { TrashPage } from "./pages/Trash";
+import { DatabasePage } from "./pages/Database";
 
 const App = () => {
   return (
@@ -16,6 +18,8 @@ const App = () => {
             <Route index element={<HomePage />} />
             <Route path="page/:pageId" element={<PageEditorPage />} />
             <Route path="search" element={<SearchPage />} />
+            <Route path="trash" element={<TrashPage />} />
+            <Route path="database/:databaseId" element={<DatabasePage />} />
           </Route>
         </Routes>
       </BrowserRouter>
