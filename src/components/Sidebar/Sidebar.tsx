@@ -89,21 +89,21 @@ const PageMenu = ({ page, onClose, position }: PageMenuProps) => {
         className="w-full flex items-center gap-2 px-3 py-1.5 text-sm text-[#37352f] hover:bg-[#efefec] text-left"
       >
         <Edit2 className="w-4 h-4" />
-        Rename
+        Переименовать
       </button>
       <button
         onClick={handleDuplicate}
         className="w-full flex items-center gap-2 px-3 py-1.5 text-sm text-[#37352f] hover:bg-[#efefec] text-left"
       >
         <Copy className="w-4 h-4" />
-        Duplicate
+        Дублировать
       </button>
       <button
         onClick={handleFavorite}
         className="w-full flex items-center gap-2 px-3 py-1.5 text-sm text-[#37352f] hover:bg-[#efefec] text-left"
       >
         <Star className={`w-4 h-4 ${page.isFavorite ? "fill-[#f5c518] text-[#f5c518]" : ""}`} />
-        {page.isFavorite ? "Remove from favorites" : "Add to favorites"}
+        {page.isFavorite ? "Убрать из избранного" : "Добавить в избранное"}
       </button>
       <div className="h-px bg-[#e6e4df] my-1" />
       <button
@@ -111,7 +111,7 @@ const PageMenu = ({ page, onClose, position }: PageMenuProps) => {
         className="w-full flex items-center gap-2 px-3 py-1.5 text-sm text-[#eb5757] hover:bg-[#efefec] text-left"
       >
         <Trash2 className="w-4 h-4" />
-        Delete
+        Удалить
       </button>
     </div>
   );
@@ -229,10 +229,10 @@ const TemplateModal = ({ onClose, onCreate }: TemplateModalProps) => {
   }, [onClose]);
 
   const templates = [
-    { id: 'tasks', name: 'Tasks Tracker', icon: '✅', description: 'Track your tasks and to-dos' },
-    { id: 'projects', name: 'Projects', icon: '📊', description: 'Manage your projects' },
-    { id: 'notes', name: 'Meeting Notes', icon: '📝', description: 'Keep meeting notes organized' },
-    { id: 'docs', name: 'Document Hub', icon: '📚', description: 'Central place for documents' },
+    { id: 'tasks', name: 'Трекер задач', icon: '✅', description: 'Отслеживайте свои задачи' },
+    { id: 'projects', name: 'Проекты', icon: '📊', description: 'Управляйте проектами' },
+    { id: 'notes', name: 'Заметки встреч', icon: '📝', description: 'Организуйте заметки встреч' },
+    { id: 'docs', name: 'Документы', icon: '📚', description: 'Центр документов' },
   ];
 
   return (
@@ -240,12 +240,12 @@ const TemplateModal = ({ onClose, onCreate }: TemplateModalProps) => {
       <div ref={modalRef} className="bg-white rounded-xl shadow-2xl w-[600px] max-h-[80vh] overflow-hidden">
         <div className="p-6 border-b border-[#e6e4df]">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-[#37352f]">Add new page</h2>
+            <h2 className="text-lg font-semibold text-[#37352f]">Создать страницу</h2>
             <button onClick={onClose} className="text-[#9b9a97] hover:text-[#37352f]">✕</button>
           </div>
           <input 
             type="text" 
-            placeholder="Search templates..." 
+            placeholder="Поиск шаблонов..." 
             className="w-full px-3 py-2 border border-[#e6e4df] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#2383e2]"
           />
         </div>
@@ -257,26 +257,26 @@ const TemplateModal = ({ onClose, onCreate }: TemplateModalProps) => {
               className="flex flex-col items-center p-4 border border-[#e6e4df] rounded-lg hover:bg-[#f7f6f3] transition-colors"
             >
               <FileText className="w-8 h-8 text-[#9b9a97] mb-2" />
-              <span className="text-sm font-medium text-[#37352f]">Empty page</span>
+              <span className="text-sm font-medium text-[#37352f]">Пустая страница</span>
             </button>
             <button 
               onClick={() => onCreate('database')}
               className="flex flex-col items-center p-4 border border-[#e6e4df] rounded-lg hover:bg-[#f7f6f3] transition-colors"
             >
               <Database className="w-8 h-8 text-[#9b9a97] mb-2" />
-              <span className="text-sm font-medium text-[#37352f]">Empty database</span>
+              <span className="text-sm font-medium text-[#37352f]">Пустая база данных</span>
             </button>
             <button 
               onClick={() => onCreate('page')}
               className="flex flex-col items-center p-4 border border-[#e6e4df] rounded-lg hover:bg-[#f7f6f3] transition-colors"
             >
               <span className="text-2xl mb-2">✨</span>
-              <span className="text-sm font-medium text-[#37352f]">Build with AI</span>
+              <span className="text-sm font-medium text-[#37352f]">Создать с ИИ</span>
             </button>
           </div>
 
           <div>
-            <h3 className="text-xs font-medium text-[#9b9a97] uppercase tracking-wide mb-3">Suggested</h3>
+            <h3 className="text-xs font-medium text-[#9b9a97] uppercase tracking-wide mb-3">Рекомендуемые</h3>
             <div className="grid grid-cols-2 gap-3">
               {templates.map(template => (
                 <button
@@ -311,28 +311,28 @@ export const Sidebar = (): JSX.Element => {
   const handleTemplateCreate = (type: 'page' | 'database' | 'template', templateId?: string) => {
     setShowTemplateModal(false);
     if (type === 'page') {
-      const newPage = createPage("Untitled");
+      const newPage = createPage("Без названия");
       setCurrentPageId(newPage.id);
       navigate(`/page/${newPage.id}`);
     } else if (type === 'database') {
-      const newDb = createDatabase("Untitled Database");
+      const newDb = createDatabase("Без названия");
       navigate(`/database/${newDb.id}`);
     } else if (type === 'template' && templateId) {
-      const newPage = createPage(templateId === 'tasks' ? 'Tasks Tracker' : templateId === 'projects' ? 'Projects' : templateId === 'notes' ? 'Meeting Notes' : 'Document Hub');
+      const newPage = createPage(templateId === 'tasks' ? 'Трекер задач' : templateId === 'projects' ? 'Проекты' : templateId === 'notes' ? 'Заметки встреч' : 'Документы');
       setCurrentPageId(newPage.id);
       navigate(`/page/${newPage.id}`);
     }
   };
 
   const topNavItems = [
-    { id: "search", label: "Search", icon: Search, path: "/search" },
-    { id: "home", label: "Home", icon: Home, path: "/" },
-    { id: "inbox", label: "Inbox", icon: Inbox, path: "/inbox" },
+    { id: "search", label: "Поиск", icon: Search, path: "/search" },
+    { id: "home", label: "Главная", icon: Home, path: "/" },
+    { id: "inbox", label: "Входящие", icon: Inbox, path: "/inbox" },
   ];
 
   const bottomItems = [
-    { id: "settings", label: "Settings", icon: Settings, path: "/settings" },
-    { id: "trash", label: "Trash", icon: Trash2, path: "/trash" },
+    { id: "settings", label: "Настройки", icon: Settings, path: "/settings" },
+    { id: "trash", label: "Корзина", icon: Trash2, path: "/trash" },
   ];
 
   return (
@@ -364,7 +364,7 @@ export const Sidebar = (): JSX.Element => {
         <div className="mb-2">
           <div className="px-4 py-1">
             <span className="text-[11px] text-[#9b9a97] font-medium uppercase tracking-wide">
-              Private
+              Личное
             </span>
           </div>
           <div className="px-2">
@@ -376,7 +376,7 @@ export const Sidebar = (): JSX.Element => {
               className="w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-left transition-colors hover:bg-[#efefec]"
             >
               <Plus className="w-4 h-4 text-[#9b9a97]" />
-              <span className="text-sm text-[#9b9a97]">Add new</span>
+              <span className="text-sm text-[#9b9a97]">Добавить</span>
             </button>
           </div>
         </div>
@@ -384,7 +384,7 @@ export const Sidebar = (): JSX.Element => {
         <div className="mb-2">
           <div className="px-4 py-1">
             <span className="text-[11px] text-[#9b9a97] font-medium uppercase tracking-wide">
-              Shared
+              Общее
             </span>
           </div>
           <div className="px-2">
@@ -393,7 +393,7 @@ export const Sidebar = (): JSX.Element => {
               className="w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-left transition-colors hover:bg-[#efefec]"
             >
               <Plus className="w-4 h-4 text-[#9b9a97]" />
-              <span className="text-sm text-[#9b9a97]">Start collaborating</span>
+              <span className="text-sm text-[#9b9a97]">Начать совместную работу</span>
             </button>
           </div>
         </div>
@@ -402,7 +402,7 @@ export const Sidebar = (): JSX.Element => {
           <div className="mb-2">
             <div className="px-4 py-1">
               <span className="text-[11px] text-[#9b9a97] font-medium uppercase tracking-wide">
-                Favorites
+                Избранное
               </span>
             </div>
             <div className="px-2">
@@ -417,7 +417,7 @@ export const Sidebar = (): JSX.Element => {
           <div className="mb-2">
             <div className="px-4 py-1">
               <span className="text-[11px] text-[#9b9a97] font-medium uppercase tracking-wide">
-                Databases
+                Базы данных
               </span>
             </div>
             <div className="px-2">
@@ -460,8 +460,8 @@ export const Sidebar = (): JSX.Element => {
         >
           <Users className="w-4 h-4 text-[#9b9a97]" />
           <div className="flex-1">
-            <div className="text-xs text-[#9b9a97]">Invite members</div>
-            <div className="text-[10px] text-[#9b9a97]">Collaborate with your team</div>
+            <div className="text-xs text-[#9b9a97]">Пригласить участников</div>
+            <div className="text-[10px] text-[#9b9a97]">Работайте вместе с командой</div>
           </div>
         </button>
       </div>

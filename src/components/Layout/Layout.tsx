@@ -13,61 +13,61 @@ interface ChatMessage {
 
 const aiResponses: Record<string, string[]> = {
   help: [
-    "I can help you with many things! Try asking me about:",
-    "• Creating new pages or databases",
-    "• Organizing your workspace",
-    "• Using keyboard shortcuts",
-    "• Tips for better note-taking",
+    "Я могу помочь вам со многими вещами! Попробуйте спросить меня о:",
+    "• Создании новых страниц или баз данных",
+    "• Организации рабочего пространства",
+    "• Использовании горячих клавиш",
+    "• Советах по ведению заметок",
   ],
   page: [
-    "To create a new page:",
-    "1. Click 'New page' in the sidebar",
-    "2. Or use the '/' command in any page",
-    "3. Start typing to add content!",
+    "Чтобы создать новую страницу:",
+    "1. Нажмите «Новая страница» в боковой панели",
+    "2. Или используйте команду «/» на любой странице",
+    "3. Начните вводить содержимое!",
   ],
   shortcut: [
-    "Here are some useful shortcuts:",
-    "• Cmd/Ctrl + K: Quick search",
-    "• Cmd/Ctrl + N: New page",
-    "• /: Open block menu",
-    "• Esc: Close menus",
+    "Вот несколько полезных сочетаний клавиш:",
+    "• Cmd/Ctrl + K: Быстрый поиск",
+    "• Cmd/Ctrl + N: Новая страница",
+    "• /: Открыть меню блоков",
+    "• Esc: Закрыть меню",
   ],
   database: [
-    "Databases help you organize structured data:",
-    "• Create tables with custom properties",
-    "• Filter and sort your data",
-    "• Use different views like table, board, or list",
+    "Базы данных помогают организовать структурированные данные:",
+    "• Создавайте таблицы с настраиваемыми свойствами",
+    "• Фильтруйте и сортируйте данные",
+    "• Используйте разные представления: таблица, доска или список",
   ],
   organize: [
-    "Tips for organizing your workspace:",
-    "• Use favorites for quick access",
-    "• Create nested pages for hierarchy",
-    "• Add icons and covers for visual distinction",
-    "• Use tags in databases for categorization",
+    "Советы по организации рабочего пространства:",
+    "• Используйте избранное для быстрого доступа",
+    "• Создавайте вложенные страницы для иерархии",
+    "• Добавляйте иконки и обложки для визуального различия",
+    "• Используйте теги в базах данных для категоризации",
   ],
   default: [
-    "I'm NoteZero AI, your workspace assistant!",
-    "I can help you navigate, organize, and get the most out of NoteZero.",
-    "Try asking about pages, shortcuts, databases, or organization tips!",
+    "Я NoteZero AI, ваш помощник по рабочему пространству!",
+    "Я могу помочь вам ориентироваться, организовывать и максимально эффективно использовать NoteZero.",
+    "Попробуйте спросить о страницах, горячих клавишах, базах данных или советах по организации!",
   ],
 };
 
 const getAIResponse = (message: string): string => {
   const lowerMessage = message.toLowerCase();
   
-  if (lowerMessage.includes('help') || lowerMessage.includes('what can you do')) {
+  if (lowerMessage.includes('помощь') || lowerMessage.includes('помоги') || lowerMessage.includes('что ты умеешь') || lowerMessage.includes('help')) {
     return aiResponses.help.join('\n');
   }
-  if (lowerMessage.includes('page') || lowerMessage.includes('create') || lowerMessage.includes('new')) {
+  if (lowerMessage.includes('страниц') || lowerMessage.includes('создать') || lowerMessage.includes('новую') || lowerMessage.includes('page') || lowerMessage.includes('create')) {
     return aiResponses.page.join('\n');
   }
-  if (lowerMessage.includes('shortcut') || lowerMessage.includes('keyboard') || lowerMessage.includes('hotkey')) {
+  if (lowerMessage.includes('клавиш') || lowerMessage.includes('горяч') || lowerMessage.includes('shortcut') || lowerMessage.includes('keyboard')) {
     return aiResponses.shortcut.join('\n');
   }
-  if (lowerMessage.includes('database') || lowerMessage.includes('table') || lowerMessage.includes('data')) {
+  if (lowerMessage.includes('база') || lowerMessage.includes('таблиц') || lowerMessage.includes('данн') || lowerMessage.includes('database') || lowerMessage.includes('table')) {
     return aiResponses.database.join('\n');
   }
-  if (lowerMessage.includes('organize') || lowerMessage.includes('structure') || lowerMessage.includes('arrange')) {
+  if (lowerMessage.includes('организ') || lowerMessage.includes('структур') || lowerMessage.includes('organize') || lowerMessage.includes('arrange')) {
     return aiResponses.organize.join('\n');
   }
   
@@ -127,9 +127,9 @@ const AIChat = ({ onClose }: { onClose: () => void }) => {
   };
 
   const suggestedQuestions = [
-    "What can you help me with?",
-    "How do I create a page?",
-    "Show me keyboard shortcuts",
+    "Чем ты можешь мне помочь?",
+    "Как создать страницу?",
+    "Покажи горячие клавиши",
   ];
 
   const handleSuggestionClick = (question: string) => {
@@ -156,8 +156,8 @@ const AIChat = ({ onClose }: { onClose: () => void }) => {
         {messages.length === 0 ? (
           <div className="text-center py-4">
             <Sparkles className="w-8 h-8 mx-auto mb-3 text-[#2383e2]" />
-            <p className="text-sm font-medium text-[#37352f] mb-1">NoteZero AI Assistant</p>
-            <p className="text-xs text-[#9b9a97] mb-4">Ask me anything about your workspace!</p>
+            <p className="text-sm font-medium text-[#37352f] mb-1">Помощник NoteZero AI</p>
+            <p className="text-xs text-[#9b9a97] mb-4">Спросите меня о вашем рабочем пространстве!</p>
             
             <div className="space-y-2">
               {suggestedQuestions.map((question, i) => (
@@ -188,7 +188,7 @@ const AIChat = ({ onClose }: { onClose: () => void }) => {
               <div className="flex justify-start">
                 <div className="bg-[#f7f6f3] text-[#37352f] px-3 py-2 rounded-lg flex items-center gap-2">
                   <Loader2 className="w-3 h-3 animate-spin text-[#9b9a97]" />
-                  <span className="text-xs text-[#9b9a97]">Thinking...</span>
+                  <span className="text-xs text-[#9b9a97]">Думаю...</span>
                 </div>
               </div>
             )}
@@ -204,7 +204,7 @@ const AIChat = ({ onClose }: { onClose: () => void }) => {
             type="text"
             value={message}
             onChange={(e) => setMessage(e.target.value)}
-            placeholder="Ask anything..."
+            placeholder="Спросите что угодно..."
             disabled={isTyping}
             className="flex-1 px-3 py-2 text-sm border border-[#e6e4df] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2383e2] focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed"
           />
@@ -257,7 +257,7 @@ const GlobalSearch = ({ onClose }: { onClose: () => void }) => {
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search pages and databases..."
+            placeholder="Поиск страниц и баз данных..."
             className="flex-1 text-sm outline-none"
           />
           <kbd className="px-2 py-1 bg-[#f7f6f3] rounded text-xs text-[#9b9a97]">ESC</kbd>
@@ -266,13 +266,13 @@ const GlobalSearch = ({ onClose }: { onClose: () => void }) => {
         <div className="max-h-80 overflow-y-auto p-2">
           {filteredPages.length === 0 && filteredDatabases.length === 0 && query && (
             <div className="text-center text-sm text-[#9b9a97] py-8">
-              No results found for "{query}"
+              Ничего не найдено по запросу «{query}»
             </div>
           )}
 
           {filteredPages.length > 0 && (
             <div className="mb-2">
-              <div className="px-2 py-1 text-xs text-[#9b9a97] font-medium">Pages</div>
+              <div className="px-2 py-1 text-xs text-[#9b9a97] font-medium">Страницы</div>
               {filteredPages.slice(0, 5).map(page => (
                 <button
                   key={page.id}
@@ -288,7 +288,7 @@ const GlobalSearch = ({ onClose }: { onClose: () => void }) => {
 
           {filteredDatabases.length > 0 && (
             <div>
-              <div className="px-2 py-1 text-xs text-[#9b9a97] font-medium">Databases</div>
+              <div className="px-2 py-1 text-xs text-[#9b9a97] font-medium">Базы данных</div>
               {filteredDatabases.map(db => (
                 <button
                   key={db.id}

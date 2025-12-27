@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Table, Columns, Calendar, List, Plus, Filter, ArrowUpDown, ChevronDown, X } from "lucide-react";
 import { useWorkspace } from "../../store";
@@ -22,6 +22,13 @@ const viewIcons = {
   list: List,
 };
 
+const viewLabels: Record<ViewType, string> = {
+  table: "Таблица",
+  board: "Доска",
+  calendar: "Календарь",
+  list: "Список",
+};
+
 export const DatabasePage = (): JSX.Element => {
   const { databaseId } = useParams<{ databaseId: string }>();
   const navigate = useNavigate();
@@ -41,8 +48,8 @@ export const DatabasePage = (): JSX.Element => {
     return (
       <div className="flex items-center justify-center h-full">
         <div className="text-center">
-          <h2 className="text-xl text-[#37352f] mb-2">Database not found</h2>
-          <Button onClick={() => navigate("/")}>Go home</Button>
+          <h2 className="text-xl text-[#37352f] mb-2">База данных не найдена</h2>
+          <Button onClick={() => navigate("/")}>На главную</Button>
         </div>
       </div>
     );
@@ -151,7 +158,7 @@ export const DatabasePage = (): JSX.Element => {
   const renderBoardView = () => {
     const statusProp = getStatusProperty();
     if (!statusProp || !statusProp.options) {
-      return <div className="p-4 text-[#9b9a97]">No status field found for board view</div>;
+      return <div className="p-4 text-[#9b9a97]">Поле статуса не найдено для представления «Доска»</div>;
     }
 
     const columns = statusProp.options.map(option => ({
@@ -180,7 +187,7 @@ export const DatabasePage = (): JSX.Element => {
                   onClick={() => setSelectedRow(row)}
                 >
                   <div className="text-sm text-[#37352f] font-medium">
-                    {row.properties.name || row.properties.Name || "Untitled"}
+                    {row.properties.name || row.properties.Name || "Без названия"}
                   </div>
                   {database.properties.filter(p => p.id !== statusProp.id && p.id !== "name").slice(0, 2).map(prop => {
                     const val = row.properties[prop.id];
@@ -215,7 +222,7 @@ export const DatabasePage = (): JSX.Element => {
   const renderCalendarView = () => {
     const dateProp = getDateProperty();
     if (!dateProp) {
-      return <div className="p-4 text-[#9b9a97]">No date field found for calendar view</div>;
+      return <div className="p-4 text-[#9b9a97]">Поле даты не найдено для представления «Календарь»</div>;
     }
 
     const today = new Date();
@@ -238,10 +245,10 @@ export const DatabasePage = (): JSX.Element => {
     return (
       <div className="p-4">
         <div className="text-lg font-medium text-[#37352f] mb-4">
-          {new Date(year, month).toLocaleDateString("en-US", { month: "long", year: "numeric" })}
+          {new Date(year, month).toLocaleDateString("ru-RU", { month: "long", year: "numeric" })}
         </div>
         <div className="grid grid-cols-7 gap-px bg-[#e6e4df]">
-          {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map(day => (
+          {["Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"].map(day => (
             <div key={day} className="bg-[#f7f6f3] p-2 text-xs text-[#9b9a97] font-medium text-center">
               {day}
             </div>
@@ -262,11 +269,11 @@ export const DatabasePage = (): JSX.Element => {
                     className="text-xs text-[#37352f] truncate bg-[#f7f6f3] rounded px-1 py-0.5 mb-1 cursor-pointer hover:bg-[#e6e4df]"
                     onClick={() => setSelectedRow(row)}
                   >
-                    {row.properties.name || row.properties.Name || "Untitled"}
+                    {row.properties.name || row.properties.Name || "Без названия"}
                   </div>
                 ))}
                 {dayRows.length > 3 && (
-                  <div className="text-xs text-[#9b9a97]">+{dayRows.length - 3} more</div>
+                  <div className="text-xs text-[#9b9a97]">+{dayRows.length - 3} ещё</div>
                 )}
               </div>
             );
@@ -285,7 +292,7 @@ export const DatabasePage = (): JSX.Element => {
           onClick={() => setSelectedRow(row)}
         >
           <div className="flex-1 text-sm text-[#37352f] font-medium">
-            {row.properties.name || row.properties.Name || "Untitled"}
+            {row.properties.name || row.properties.Name || "Без названия"}
           </div>
           {database.properties.filter(p => p.id !== "name").slice(0, 3).map(prop => {
             const val = row.properties[prop.id];
@@ -325,7 +332,7 @@ export const DatabasePage = (): JSX.Element => {
           </div>
           <Button className="bg-[#2383e2] hover:bg-[#1a6bc7] text-white">
             <Plus className="w-4 h-4 mr-1" />
-            New
+            Создать
           </Button>
         </div>
         
@@ -338,7 +345,7 @@ export const DatabasePage = (): JSX.Element => {
               className="text-[#37352f]"
             >
               <ViewIcon className="w-4 h-4 mr-1" />
-              {currentView.charAt(0).toUpperCase() + currentView.slice(1)}
+              {viewLabels[currentView]}
               <ChevronDown className="w-3 h-3 ml-1" />
             </Button>
             
@@ -353,7 +360,7 @@ export const DatabasePage = (): JSX.Element => {
                       className={`w-full flex items-center gap-2 px-3 py-1.5 text-sm hover:bg-[#efefec] ${currentView === view ? "bg-[#efefec]" : ""}`}
                     >
                       <Icon className="w-4 h-4" />
-                      {view.charAt(0).toUpperCase() + view.slice(1)}
+                      {viewLabels[view]}
                     </button>
                   );
                 })}
@@ -369,7 +376,7 @@ export const DatabasePage = (): JSX.Element => {
               className="text-[#9b9a97]"
             >
               <Filter className="w-4 h-4 mr-1" />
-              Filter
+              Фильтр
               {filters.length > 0 && (
                 <span className="ml-1 bg-[#2383e2] text-white text-xs px-1.5 rounded">
                   {filters.length}
@@ -403,9 +410,9 @@ export const DatabasePage = (): JSX.Element => {
                       }}
                       className="text-sm border border-[#e6e4df] rounded px-2 py-1"
                     >
-                      <option value="contains">contains</option>
-                      <option value="equals">equals</option>
-                      <option value="not_equals">not equals</option>
+                      <option value="contains">содержит</option>
+                      <option value="equals">равно</option>
+                      <option value="not_equals">не равно</option>
                     </select>
                     <Input
                       value={filter.value}
@@ -415,7 +422,7 @@ export const DatabasePage = (): JSX.Element => {
                         setFilters(newFilters);
                       }}
                       className="text-sm h-8"
-                      placeholder="Value"
+                      placeholder="Значение"
                     />
                     <button
                       onClick={() => setFilters(filters.filter((_, i) => i !== idx))}
@@ -432,7 +439,7 @@ export const DatabasePage = (): JSX.Element => {
                   className="text-[#2383e2]"
                 >
                   <Plus className="w-4 h-4 mr-1" />
-                  Add filter
+                  Добавить фильтр
                 </Button>
               </div>
             )}
@@ -446,7 +453,7 @@ export const DatabasePage = (): JSX.Element => {
               className="text-[#9b9a97]"
             >
               <ArrowUpDown className="w-4 h-4 mr-1" />
-              Sort
+              Сортировка
               {sortField && <span className="ml-1 text-[#2383e2]">1</span>}
             </Button>
             
@@ -456,7 +463,7 @@ export const DatabasePage = (): JSX.Element => {
                   onClick={() => { setSortField(null); setShowSortMenu(false); }}
                   className={`w-full text-left px-3 py-1.5 text-sm hover:bg-[#efefec] ${!sortField ? "bg-[#efefec]" : ""}`}
                 >
-                  None
+                  Нет
                 </button>
                 {database.properties.map(prop => (
                   <button

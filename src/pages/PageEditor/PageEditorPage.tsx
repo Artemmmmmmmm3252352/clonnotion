@@ -32,17 +32,17 @@ const SharePanel = ({ onClose }: { onClose: () => void }) => {
     >
       <div className="p-4 border-b border-[#e6e4df]">
         <div className="flex gap-4 mb-4">
-          <button className="text-sm font-medium text-[#37352f] border-b-2 border-[#37352f] pb-1">Share</button>
-          <button className="text-sm text-[#9b9a97] pb-1">Publish</button>
+          <button className="text-sm font-medium text-[#37352f] border-b-2 border-[#37352f] pb-1">Поделиться</button>
+          <button className="text-sm text-[#9b9a97] pb-1">Опубликовать</button>
         </div>
         
         <input
           type="text"
-          placeholder="Email or group, separated by commas"
+          placeholder="Email или группа, через запятую"
           className="w-full px-3 py-2 text-sm border border-[#e6e4df] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2383e2]"
         />
         <button className="mt-2 px-3 py-1.5 bg-[#2383e2] text-white text-sm rounded-lg hover:bg-[#1a6fc9]">
-          Invite
+          Пригласить
         </button>
       </div>
 
@@ -52,24 +52,24 @@ const SharePanel = ({ onClose }: { onClose: () => void }) => {
             U
           </div>
           <div className="flex-1">
-            <div className="text-sm text-[#37352f]">You</div>
+            <div className="text-sm text-[#37352f]">Вы</div>
             <div className="text-xs text-[#9b9a97]">user@example.com</div>
           </div>
-          <span className="text-xs text-[#9b9a97]">Full access</span>
+          <span className="text-xs text-[#9b9a97]">Полный доступ</span>
         </div>
       </div>
 
       <div className="p-4">
         <div className="flex items-center gap-2 text-sm text-[#37352f] mb-2">
           <Lock className="w-4 h-4 text-[#9b9a97]" />
-          <span>Only people invited</span>
+          <span>Только приглашённые</span>
         </div>
         <button 
           onClick={handleCopyLink}
           className="flex items-center gap-2 text-sm text-[#2383e2] hover:underline"
         >
           {copied ? <Check className="w-4 h-4" /> : <Link className="w-4 h-4" />}
-          {copied ? "Link copied!" : "Copy link"}
+          {copied ? "Ссылка скопирована!" : "Скопировать ссылку"}
         </button>
       </div>
     </div>
@@ -102,7 +102,7 @@ export const PageEditorPage = (): JSX.Element => {
   
   const page = pageId ? getPage(pageId) : null;
   const [isEditingTitle, setIsEditingTitle] = useState(false);
-  const [title, setTitle] = useState(page?.title || "Untitled");
+  const [title, setTitle] = useState(page?.title || "Без названия");
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [showCoverMenu, setShowCoverMenu] = useState(false);
   const [isHoveringCover, setIsHoveringCover] = useState(false);
@@ -137,8 +137,8 @@ export const PageEditorPage = (): JSX.Element => {
     return (
       <div className="flex items-center justify-center h-full">
         <div className="text-center">
-          <h2 className="text-xl text-[#37352f] mb-2">Page not found</h2>
-          <Button onClick={() => navigate("/")}>Go home</Button>
+          <h2 className="text-xl text-[#37352f] mb-2">Страница не найдена</h2>
+          <Button onClick={() => navigate("/")}>На главную</Button>
         </div>
       </div>
     );
@@ -146,7 +146,7 @@ export const PageEditorPage = (): JSX.Element => {
 
   const handleTitleChange = (newTitle: string) => {
     setTitle(newTitle);
-    updatePage(page.id, { title: newTitle || "Untitled" });
+    updatePage(page.id, { title: newTitle || "Без названия" });
   };
 
   const handleIconChange = (emoji: string) => {
@@ -190,7 +190,7 @@ export const PageEditorPage = (): JSX.Element => {
               onClick={() => setShowSharePanel(!showSharePanel)}
               className="h-7 px-3 text-sm text-[#37352f]"
             >
-              Share
+              Поделиться
             </Button>
             {showSharePanel && <SharePanel onClose={() => setShowSharePanel(false)} />}
           </div>
@@ -222,7 +222,7 @@ export const PageEditorPage = (): JSX.Element => {
                   onClick={(e) => { e.stopPropagation(); setShowCoverMenu(true); }}
                   className="bg-white/90 hover:bg-white text-[#37352f] text-xs px-3 py-1.5 rounded shadow"
                 >
-                  Change cover
+                  Изменить обложку
                 </button>
               </div>
             )}
@@ -264,7 +264,7 @@ export const PageEditorPage = (): JSX.Element => {
                     className="text-sm text-[#9b9a97] hover:bg-[#efefec] rounded px-2 py-1 flex items-center gap-1"
                   >
                     <Image className="w-4 h-4" />
-                    Add cover
+                    Добавить обложку
                   </button>
                 </div>
               )}
@@ -276,15 +276,15 @@ export const PageEditorPage = (): JSX.Element => {
                 onClick={(e) => e.stopPropagation()}
               >
                 <div className="flex items-center justify-between mb-3">
-                  <span className="text-sm font-medium text-[#37352f]">Cover</span>
+                  <span className="text-sm font-medium text-[#37352f]">Обложка</span>
                   {page.cover && (
                     <button onClick={handleRemoveCover} className="text-xs text-[#eb5757] hover:underline">
-                      Remove
+                      Удалить
                     </button>
                   )}
                 </div>
                 <div className="mb-3">
-                  <div className="text-xs text-[#9b9a97] mb-2">Gradients</div>
+                  <div className="text-xs text-[#9b9a97] mb-2">Градиенты</div>
                   <div className="grid grid-cols-5 gap-2">
                     {coverGradients.map((gradient, idx) => (
                       <button
@@ -297,7 +297,7 @@ export const PageEditorPage = (): JSX.Element => {
                   </div>
                 </div>
                 <div>
-                  <div className="text-xs text-[#9b9a97] mb-2">Colors</div>
+                  <div className="text-xs text-[#9b9a97] mb-2">Сплошные цвета</div>
                   <div className="grid grid-cols-8 gap-2">
                     {coverColors.map((color, idx) => (
                       <button
@@ -320,14 +320,14 @@ export const PageEditorPage = (): JSX.Element => {
                 onBlur={() => setIsEditingTitle(false)}
                 onKeyDown={(e) => e.key === "Enter" && setIsEditingTitle(false)}
                 className="text-4xl font-bold text-[#37352f] outline-none w-full bg-transparent"
-                placeholder="Untitled"
+                placeholder="Без названия"
               />
             ) : (
               <h1
                 onClick={() => setIsEditingTitle(true)}
                 className="text-4xl font-bold text-[#37352f] cursor-text hover:bg-[#efefec] rounded px-1 -mx-1"
               >
-                {page.title || "Untitled"}
+                {page.title || "Без названия"}
               </h1>
             )}
           </div>

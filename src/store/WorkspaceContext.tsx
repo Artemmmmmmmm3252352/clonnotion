@@ -6,20 +6,20 @@ const generateId = () => Math.random().toString(36).substr(2, 9);
 const defaultPages: Page[] = [
   {
     id: 'welcome',
-    title: 'Welcome to NoteZero!',
+    title: 'Добро пожаловать в NoteZero!',
     icon: '👋',
     parentId: null,
     blocks: [
-      { id: 'w1', type: 'heading1', content: 'Welcome to NoteZero!' },
-      { id: 'w2', type: 'todo', content: 'Create an account with NoteZero', checked: true },
-      { id: 'w3', type: 'todo', content: 'Download the desktop app to unlock offline mode and take NoteZero with you wherever you go', checked: true },
-      { id: 'w4', type: 'todo', content: 'Click anywhere below and type / to see what you can create — headers, tables, to-do\'s, etc.', checked: true },
-      { id: 'w5', type: 'todo', content: 'Type /page to add a new page and nest anything, anywhere', checked: false },
-      { id: 'w6', type: 'todo', content: 'Find, organize, and add new pages using the sidebar to the left ⭐', checked: false },
-      { id: 'w7', type: 'todo', content: 'Check out the To Do List we added for you with more tips and tricks to best use NoteZero', checked: false },
-      { id: 'w8', type: 'todo', content: 'Make a new page and type /meet: to capture meeting notes and thoughts effortlessly', checked: false },
-      { id: 'w9', type: 'todo', content: 'Click on the 🤖 NoteZero AI face in the bottom right of your screen to see what Agent can do', checked: false },
-      { id: 'w10', type: 'toggle', content: 'This is a toggle block. Click the little triangle to see a few more useful tips!' },
+      { id: 'w1', type: 'heading1', content: 'Добро пожаловать в NoteZero!' },
+      { id: 'w2', type: 'todo', content: 'Создайте аккаунт в NoteZero', checked: true },
+      { id: 'w3', type: 'todo', content: 'Скачайте десктопное приложение для работы офлайн и используйте NoteZero где угодно', checked: true },
+      { id: 'w4', type: 'todo', content: 'Нажмите в любом месте ниже и введите / чтобы увидеть что можно создать — заголовки, таблицы, задачи и т.д.', checked: true },
+      { id: 'w5', type: 'todo', content: 'Введите /page чтобы добавить новую страницу и вкладывать что угодно куда угодно', checked: false },
+      { id: 'w6', type: 'todo', content: 'Находите, организуйте и добавляйте новые страницы через боковую панель слева ⭐', checked: false },
+      { id: 'w7', type: 'todo', content: 'Посмотрите Список задач, который мы добавили для вас с дополнительными советами', checked: false },
+      { id: 'w8', type: 'todo', content: 'Создайте новую страницу и введите /meet: для записи заметок встреч', checked: false },
+      { id: 'w9', type: 'todo', content: 'Нажмите на 🤖 NoteZero AI в правом нижнем углу экрана чтобы узнать возможности Агента', checked: false },
+      { id: 'w10', type: 'toggle', content: 'Это блок-переключатель. Нажмите на треугольник чтобы увидеть ещё несколько полезных советов!' },
     ],
     isFavorite: false,
     isArchived: false,
@@ -28,12 +28,12 @@ const defaultPages: Page[] = [
   },
   {
     id: 'todo-list',
-    title: 'To Do List',
+    title: 'Список задач',
     icon: '✅',
     parentId: null,
     blocks: [
-      { id: 't1', type: 'heading1', content: 'To Do List' },
-      { id: 't2', type: 'text', content: 'Your tasks and action items organized in one place.' },
+      { id: 't1', type: 'heading1', content: 'Список задач' },
+      { id: 't2', type: 'text', content: 'Ваши задачи и дела организованы в одном месте.' },
     ],
     isFavorite: false,
     isArchived: false,
@@ -42,16 +42,16 @@ const defaultPages: Page[] = [
   },
   {
     id: 'q4-project',
-    title: 'Q4 Project Plan',
+    title: 'План на Q4',
     icon: '📋',
     parentId: null,
     blocks: [
-      { id: '8', type: 'heading1', content: 'Q4 Project Plan' },
-      { id: '9', type: 'text', content: 'Key milestones and strategy for the upcoming quarter.' },
-      { id: '10', type: 'heading2', content: 'Goals' },
-      { id: '11', type: 'bulleted_list', content: 'Complete user research' },
-      { id: '12', type: 'bulleted_list', content: 'Launch MVP' },
-      { id: '13', type: 'bulleted_list', content: 'Gather feedback' },
+      { id: '8', type: 'heading1', content: 'План на Q4' },
+      { id: '9', type: 'text', content: 'Ключевые этапы и стратегия на предстоящий квартал.' },
+      { id: '10', type: 'heading2', content: 'Цели' },
+      { id: '11', type: 'bulleted_list', content: 'Завершить исследование пользователей' },
+      { id: '12', type: 'bulleted_list', content: 'Запустить MVP' },
+      { id: '13', type: 'bulleted_list', content: 'Собрать обратную связь' },
     ],
     isFavorite: true,
     isArchived: false,
@@ -63,29 +63,29 @@ const defaultPages: Page[] = [
 const defaultDatabases: Database[] = [
   {
     id: 'todo-db',
-    name: 'To Do List',
+    name: 'Список задач',
     icon: '✅',
     properties: [
-      { id: 'name', name: 'Name', type: 'text' },
+      { id: 'name', name: 'Название', type: 'text' },
       { 
         id: 'status', 
-        name: 'Status', 
+        name: 'Статус', 
         type: 'select',
         options: [
-          { id: 'todo', name: 'To Do', color: 'bg-[#efefec] text-[#65645f]' },
-          { id: 'done', name: 'Done', color: 'bg-[#d3f5e1] text-[#0d7d3d]' },
+          { id: 'todo', name: 'К выполнению', color: 'bg-[#efefec] text-[#65645f]' },
+          { id: 'done', name: 'Готово', color: 'bg-[#d3f5e1] text-[#0d7d3d]' },
         ]
       },
-      { id: 'due-date', name: 'Due Date', type: 'date' },
+      { id: 'due-date', name: 'Срок', type: 'date' },
     ],
     rows: [
-      { id: 'task1', properties: { name: 'Check the box to mark items as done', status: 'done', 'due-date': 'Today' }, pageId: '' },
-      { id: 'task2', properties: { name: 'Click the due date to change it', status: 'todo', 'due-date': 'Today' }, pageId: '' },
-      { id: 'task3', properties: { name: 'Click me to see even more detail', status: 'todo', 'due-date': 'Today' }, pageId: '' },
-      { id: 'task4', properties: { name: 'Click the blue New button to add a task', status: 'todo', 'due-date': 'Today' }, pageId: '' },
-      { id: 'task5', properties: { name: 'Click me to learn how to hide checked items', status: 'todo', 'due-date': 'Today' }, pageId: '' },
-      { id: 'task6', properties: { name: 'See finished items in the "Done" view', status: 'todo', 'due-date': 'Today' }, pageId: '' },
-      { id: 'task7', properties: { name: 'Click me to learn how to see your content your way', status: 'todo', 'due-date': 'Tomorrow' }, pageId: '' },
+      { id: 'task1', properties: { name: 'Отметьте галочку чтобы отметить задачу выполненной', status: 'done', 'due-date': 'Сегодня' }, pageId: '' },
+      { id: 'task2', properties: { name: 'Нажмите на срок чтобы изменить его', status: 'todo', 'due-date': 'Сегодня' }, pageId: '' },
+      { id: 'task3', properties: { name: 'Нажмите на меня чтобы увидеть больше деталей', status: 'todo', 'due-date': 'Сегодня' }, pageId: '' },
+      { id: 'task4', properties: { name: 'Нажмите синюю кнопку Создать для добавления задачи', status: 'todo', 'due-date': 'Сегодня' }, pageId: '' },
+      { id: 'task5', properties: { name: 'Нажмите на меня чтобы узнать как скрыть выполненные задачи', status: 'todo', 'due-date': 'Сегодня' }, pageId: '' },
+      { id: 'task6', properties: { name: 'Смотрите выполненные задачи в представлении «Готово»', status: 'todo', 'due-date': 'Сегодня' }, pageId: '' },
+      { id: 'task7', properties: { name: 'Нажмите на меня чтобы узнать как просматривать контент по-своему', status: 'todo', 'due-date': 'Завтра' }, pageId: '' },
     ],
     createdAt: new Date(),
     updatedAt: new Date(),
@@ -94,7 +94,7 @@ const defaultDatabases: Database[] = [
 
 const initialWorkspace: Workspace = {
   id: 'default',
-  name: 'Personal Workspace',
+  name: 'Личное пространство',
   pages: defaultPages,
   databases: defaultDatabases,
 };
@@ -142,7 +142,7 @@ export const WorkspaceProvider = ({ children }: { children: ReactNode }) => {
   const createPage = useCallback((title: string, parentId: string | null = null): Page => {
     const newPage: Page = {
       id: generateId(),
-      title: title || 'Untitled',
+      title: title || 'Без названия',
       parentId,
       blocks: [{ id: generateId(), type: 'text', content: '' }],
       isFavorite: false,
@@ -182,7 +182,7 @@ export const WorkspaceProvider = ({ children }: { children: ReactNode }) => {
     const newPage: Page = {
       ...page,
       id: generateId(),
-      title: `${page.title} (copy)`,
+      title: `${page.title} (копия)`,
       blocks: page.blocks.map(block => ({ ...block, id: generateId() })),
       isFavorite: false,
       createdAt: new Date(),
@@ -341,18 +341,18 @@ export const WorkspaceProvider = ({ children }: { children: ReactNode }) => {
   const createDatabase = useCallback((name: string): Database => {
     const newDatabase: Database = {
       id: generateId(),
-      name: name || 'Untitled Database',
+      name: name || 'Без названия',
       icon: '📋',
       properties: [
-        { id: 'name', name: 'Name', type: 'text' },
+        { id: 'name', name: 'Название', type: 'text' },
         { 
           id: 'status', 
-          name: 'Status', 
+          name: 'Статус', 
           type: 'select',
           options: [
-            { id: 'todo', name: 'To Do', color: 'bg-[#efefec] text-[#65645f]' },
-            { id: 'in-progress', name: 'In Progress', color: 'bg-[#dbeafe] text-[#1e40af]' },
-            { id: 'done', name: 'Done', color: 'bg-[#d3f5e1] text-[#0d7d3d]' },
+            { id: 'todo', name: 'К выполнению', color: 'bg-[#efefec] text-[#65645f]' },
+            { id: 'in-progress', name: 'В процессе', color: 'bg-[#dbeafe] text-[#1e40af]' },
+            { id: 'done', name: 'Готово', color: 'bg-[#d3f5e1] text-[#0d7d3d]' },
           ]
         },
       ],

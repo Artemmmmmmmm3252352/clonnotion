@@ -47,7 +47,7 @@ export const RecordModal = ({ database, row, onClose }: RecordModalProps): JSX.E
       id: Math.random().toString(36).substr(2, 9),
       content: newComment.trim(),
       timestamp: new Date(),
-      author: "You",
+      author: "Вы",
     };
     
     setComments(prev => [...prev, comment]);
@@ -65,7 +65,7 @@ export const RecordModal = ({ database, row, onClose }: RecordModalProps): JSX.E
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   };
 
-  const title = row.properties.name || row.properties.Name || "Untitled";
+  const title = row.properties.name || row.properties.Name || "Без названия";
 
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center pt-16 bg-black/30" onClick={onClose}>
@@ -105,7 +105,7 @@ export const RecordModal = ({ database, row, onClose }: RecordModalProps): JSX.E
           </div>
 
           <div className="mt-8 pt-4 border-t border-[#e6e4df]">
-            <div className="text-sm text-[#9b9a97] mb-3">Comments</div>
+            <div className="text-sm text-[#9b9a97] mb-3">Комментарии</div>
             
             {comments.length > 0 && (
               <div className="space-y-3 mb-4">
@@ -136,7 +136,7 @@ export const RecordModal = ({ database, row, onClose }: RecordModalProps): JSX.E
                   value={newComment}
                   onChange={(e) => setNewComment(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  placeholder="Add a comment..."
+                  placeholder="Добавить комментарий..."
                   className="w-full bg-[#f7f6f3] rounded-lg px-4 py-2.5 pr-10 text-sm text-[#37352f] placeholder-[#9b9a97] focus:outline-none focus:ring-2 focus:ring-[#2383e2]"
                 />
                 {newComment.trim() && (

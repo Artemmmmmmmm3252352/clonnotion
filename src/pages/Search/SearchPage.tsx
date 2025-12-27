@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Search, FileText, Database } from "lucide-react";
 import { useWorkspace } from "../../store";
@@ -57,7 +57,7 @@ export const SearchPage = (): JSX.Element => {
               autoFocus
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search pages and databases..."
+              placeholder="Поиск страниц и баз данных..."
               className="pl-12 h-12 text-lg bg-white border-[#e6e4df] rounded-xl focus:ring-2 focus:ring-[#2383e2] text-[#37352f] placeholder:text-[#9b9a97]"
             />
           </div>
@@ -68,7 +68,7 @@ export const SearchPage = (): JSX.Element => {
             {filteredPages.length > 0 && (
               <div>
                 <h3 className="text-xs text-[#9b9a97] font-medium uppercase tracking-wide mb-3">
-                  Pages
+                  Страницы
                 </h3>
                 <div className="space-y-2">
                   {filteredPages.map(page => (
@@ -104,7 +104,7 @@ export const SearchPage = (): JSX.Element => {
             {filteredDatabases.length > 0 && (
               <div>
                 <h3 className="text-xs text-[#9b9a97] font-medium uppercase tracking-wide mb-3">
-                  Databases
+                  Базы данных
                 </h3>
                 <div className="space-y-2">
                   {filteredDatabases.map(db => (
@@ -128,7 +128,7 @@ export const SearchPage = (): JSX.Element => {
             {matchingRows.length > 0 && (
               <div>
                 <h3 className="text-xs text-[#9b9a97] font-medium uppercase tracking-wide mb-3">
-                  Database Records
+                  Записи баз данных
                 </h3>
                 <div className="space-y-2">
                   {matchingRows.map(row => (
@@ -138,10 +138,10 @@ export const SearchPage = (): JSX.Element => {
                     >
                       <CardContent className="p-4">
                         <div className="text-[15px] text-[#37352f] font-medium">
-                          {highlightText(String(row.properties.name || row.properties.Name || 'Untitled'), query)}
+                          {highlightText(String(row.properties.name || row.properties.Name || 'Без названия'), query)}
                         </div>
                         <div className="text-xs text-[#9b9a97] mt-1">
-                          in {row.databaseName}
+                          в {row.databaseName}
                         </div>
                       </CardContent>
                     </Card>
@@ -153,9 +153,9 @@ export const SearchPage = (): JSX.Element => {
             {filteredPages.length === 0 && filteredDatabases.length === 0 && matchingRows.length === 0 && (
               <div className="text-center py-12">
                 <Search className="w-12 h-12 text-[#d3d1cb] mx-auto mb-4" />
-                <h3 className="text-lg text-[#37352f] font-medium mb-2">No results found</h3>
+                <h3 className="text-lg text-[#37352f] font-medium mb-2">Ничего не найдено</h3>
                 <p className="text-sm text-[#9b9a97]">
-                  Try searching for something else
+                  Попробуйте другой поисковый запрос
                 </p>
               </div>
             )}
@@ -165,9 +165,9 @@ export const SearchPage = (): JSX.Element => {
         {!query && (
           <div className="text-center py-12">
             <Search className="w-12 h-12 text-[#d3d1cb] mx-auto mb-4" />
-            <h3 className="text-lg text-[#37352f] font-medium mb-2">Search your workspace</h3>
+            <h3 className="text-lg text-[#37352f] font-medium mb-2">Поиск по рабочему пространству</h3>
             <p className="text-sm text-[#9b9a97]">
-              Find pages and databases by typing above
+              Введите запрос выше, чтобы найти страницы и базы данных
             </p>
           </div>
         )}

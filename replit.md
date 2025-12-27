@@ -60,10 +60,12 @@ public/              - Static assets
 - `/settings` - Settings page
 
 ## Recent Changes (December 2024)
+- **Fully translated to Russian** - all UI text, labels, messages in Russian
 - Fixed text input reversal bug with uncontrolled contentEditable pattern
 - Made Home page dynamic with real workspace data
 - Simplified sidebar: removed Marketplace, NoteZero AI, NoteZero Apps
 - Cleaned up unused Figma design files and placeholder images
+- Added functional comments in record modals
 - Added page cover images (gradients and solid colors)
 - Expanded emoji picker for page icons
 - Added breadcrumb navigation
