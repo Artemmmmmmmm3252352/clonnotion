@@ -270,7 +270,7 @@ export const PageEditorPage = (): JSX.Element => {
                 >
                   {page.icon || "📄"}
                 </button>
-                
+
                 {showEmojiPicker && (
                   <div className="absolute left-0 top-full mt-2 bg-white border border-[#e6e4df] rounded-lg shadow-xl p-4 z-50 w-[280px]">
                     <div className="text-xs font-semibold text-[#37352f] mb-3">Выберите иконку</div>
@@ -290,95 +290,95 @@ export const PageEditorPage = (): JSX.Element => {
               </div>
 
               {!page.cover && (
-                <div className="relative" onClick={(e) => e.stopPropagation()}>
-                  <button
-                    onClick={() => setShowCoverMenu(!showCoverMenu)}
-                    className="text-sm text-[#9b9a97] hover:bg-[#efefec] rounded px-2 py-1 flex items-center gap-1"
-                  >
-                    <Image className="w-4 h-4" />
-                    Добавить обложку
-                  </button>
-                </div>
+                <button
+                  onClick={(e) => { e.stopPropagation(); setShowCoverMenu(true); }}
+                  className="text-sm text-[#9b9a97] hover:bg-[#efefec] rounded px-2 py-1 flex items-center gap-1"
+                >
+                  <Image className="w-4 h-4" />
+                  Добавить обложку
+                </button>
               )}
             </div>
 
             {showCoverMenu && (
-              <div
-                className="absolute left-0 top-full mt-2 bg-white border border-[#e6e4df] rounded-lg shadow-xl p-4 z-50 w-[360px]"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <div className="flex items-center justify-between mb-4">
-                  <span className="text-sm font-semibold text-[#37352f]">Обложка страницы</span>
-                  {page.cover && (
+              <div className="relative mb-4">
+                <div
+                  className="absolute left-0 top-0 bg-white border border-[#e6e4df] rounded-lg shadow-xl p-4 z-50 w-[360px]"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <div className="flex items-center justify-between mb-4">
+                    <span className="text-sm font-semibold text-[#37352f]">Обложка страницы</span>
+                    {page.cover && (
+                      <button
+                        onClick={handleRemoveCover}
+                        className="text-xs text-[#eb5757] hover:bg-red-50 px-2 py-1 rounded transition-colors"
+                      >
+                        Удалить
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="mb-4">
                     <button
-                      onClick={handleRemoveCover}
-                      className="text-xs text-[#eb5757] hover:bg-red-50 px-2 py-1 rounded transition-colors"
+                      onClick={() => fileInputRef.current?.click()}
+                      className="w-full py-2 px-3 border-2 border-dashed border-[#e6e4df] rounded-lg hover:border-[#2383e2] hover:bg-[#f7f9fb] transition-all text-sm text-[#37352f] font-medium flex items-center justify-center gap-2"
                     >
-                      Удалить
+                      <Image className="w-4 h-4" />
+                      Загрузить изображение
                     </button>
-                  )}
-                </div>
-
-                <div className="mb-4">
-                  <button
-                    onClick={() => fileInputRef.current?.click()}
-                    className="w-full py-2 px-3 border-2 border-dashed border-[#e6e4df] rounded-lg hover:border-[#2383e2] hover:bg-[#f7f9fb] transition-all text-sm text-[#37352f] font-medium flex items-center justify-center gap-2"
-                  >
-                    <Image className="w-4 h-4" />
-                    Загрузить изображение
-                  </button>
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageUpload}
-                    className="hidden"
-                  />
-                </div>
-
-                <div className="mb-4">
-                  <div className="text-xs font-medium text-[#37352f] mb-2">Готовые изображения</div>
-                  <div className="grid grid-cols-3 gap-2">
-                    {coverImages.map((image, idx) => (
-                      <button
-                        key={idx}
-                        onClick={() => handleCoverChange(`url(${image}) center/cover`)}
-                        className="aspect-video rounded border-2 border-[#e6e4df] hover:border-[#2383e2] overflow-hidden transition-all hover:scale-105"
-                        style={{
-                          backgroundImage: `url(${image})`,
-                          backgroundSize: 'cover',
-                          backgroundPosition: 'center'
-                        }}
-                      />
-                    ))}
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageUpload}
+                      className="hidden"
+                    />
                   </div>
-                </div>
 
-                <div className="mb-4">
-                  <div className="text-xs font-medium text-[#37352f] mb-2">Градиенты</div>
-                  <div className="grid grid-cols-6 gap-2">
-                    {coverGradients.map((gradient, idx) => (
-                      <button
-                        key={idx}
-                        onClick={() => handleCoverChange(gradient)}
-                        className="aspect-video rounded border-2 border-[#e6e4df] hover:border-[#2383e2] transition-all hover:scale-105"
-                        style={{ background: gradient }}
-                      />
-                    ))}
+                  <div className="mb-4">
+                    <div className="text-xs font-medium text-[#37352f] mb-2">Готовые изображения</div>
+                    <div className="grid grid-cols-3 gap-2">
+                      {coverImages.map((image, idx) => (
+                        <button
+                          key={idx}
+                          onClick={() => handleCoverChange(`url(${image}) center/cover`)}
+                          className="aspect-video rounded border-2 border-[#e6e4df] hover:border-[#2383e2] overflow-hidden transition-all hover:scale-105"
+                          style={{
+                            backgroundImage: `url(${image})`,
+                            backgroundSize: 'cover',
+                            backgroundPosition: 'center'
+                          }}
+                        />
+                      ))}
+                    </div>
                   </div>
-                </div>
 
-                <div>
-                  <div className="text-xs font-medium text-[#37352f] mb-2">Сплошные цвета</div>
-                  <div className="grid grid-cols-8 gap-2">
-                    {coverColors.map((color, idx) => (
-                      <button
-                        key={idx}
-                        onClick={() => handleCoverChange(color)}
-                        className="w-8 h-8 rounded border-2 border-[#e6e4df] hover:border-[#2383e2] transition-all hover:scale-110"
-                        style={{ background: color }}
-                      />
-                    ))}
+                  <div className="mb-4">
+                    <div className="text-xs font-medium text-[#37352f] mb-2">Градиенты</div>
+                    <div className="grid grid-cols-6 gap-2">
+                      {coverGradients.map((gradient, idx) => (
+                        <button
+                          key={idx}
+                          onClick={() => handleCoverChange(gradient)}
+                          className="aspect-video rounded border-2 border-[#e6e4df] hover:border-[#2383e2] transition-all hover:scale-105"
+                          style={{ background: gradient }}
+                        />
+                      ))}
+                    </div>
+                  </div>
+
+                  <div>
+                    <div className="text-xs font-medium text-[#37352f] mb-2">Сплошные цвета</div>
+                    <div className="grid grid-cols-8 gap-2">
+                      {coverColors.map((color, idx) => (
+                        <button
+                          key={idx}
+                          onClick={() => handleCoverChange(color)}
+                          className="w-8 h-8 rounded border-2 border-[#e6e4df] hover:border-[#2383e2] transition-all hover:scale-110"
+                          style={{ background: color }}
+                        />
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>
