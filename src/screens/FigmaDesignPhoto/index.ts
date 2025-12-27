@@ -1,0 +1,1 @@
+export { FigmaDesignPhoto } from "./FigmaDesignPhoto";
