@@ -86,13 +86,25 @@ const coverGradients = [
   "linear-gradient(135deg, #fa709a 0%, #fee140 100%)",
   "linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%)",
   "linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)",
-  "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+  "linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)",
   "linear-gradient(135deg, #89f7fe 0%, #66a6ff 100%)",
   "linear-gradient(135deg, #fddb92 0%, #d1fdff 100%)",
+  "linear-gradient(135deg, #ff6b6b 0%, #feca57 100%)",
+  "linear-gradient(135deg, #ee9ca7 0%, #ffdde1 100%)",
 ];
 
 const coverColors = [
-  "#e6e4df", "#f5f5f4", "#fef3c7", "#dcfce7", "#dbeafe", "#e0e7ff", "#fce7f3", "#fecaca"
+  "#e6e4df", "#f5f5f4", "#fef3c7", "#dcfce7", "#dbeafe", "#e0e7ff", "#fce7f3", "#fecaca",
+  "#d1fae5", "#fef9c3", "#e9d5ff", "#cffafe"
+];
+
+const coverImages = [
+  "https://images.pexels.com/photos/1323550/pexels-photo-1323550.jpeg?auto=compress&cs=tinysrgb&w=1200",
+  "https://images.pexels.com/photos/1287145/pexels-photo-1287145.jpeg?auto=compress&cs=tinysrgb&w=1200",
+  "https://images.pexels.com/photos/1366919/pexels-photo-1366919.jpeg?auto=compress&cs=tinysrgb&w=1200",
+  "https://images.pexels.com/photos/235994/pexels-photo-235994.jpeg?auto=compress&cs=tinysrgb&w=1200",
+  "https://images.pexels.com/photos/1089438/pexels-photo-1089438.jpeg?auto=compress&cs=tinysrgb&w=1200",
+  "https://images.pexels.com/photos/1261728/pexels-photo-1261728.jpeg?auto=compress&cs=tinysrgb&w=1200",
 ];
 
 export const PageEditorPage = (): JSX.Element => {
@@ -107,6 +119,7 @@ export const PageEditorPage = (): JSX.Element => {
   const [showCoverMenu, setShowCoverMenu] = useState(false);
   const [isHoveringCover, setIsHoveringCover] = useState(false);
   const [showSharePanel, setShowSharePanel] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const pagePath = pageId ? getPagePath(pageId) : [];
 
@@ -164,6 +177,18 @@ export const PageEditorPage = (): JSX.Element => {
     setShowCoverMenu(false);
   };
 
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const imageUrl = event.target?.result as string;
+        handleCoverChange(`url(${imageUrl})`);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   return (
     <div className="h-full flex flex-col bg-white">
       <header className="flex items-center justify-between px-4 py-2 border-b border-[#e6e4df]">
@@ -211,18 +236,24 @@ export const PageEditorPage = (): JSX.Element => {
       <main className="flex-1 overflow-y-auto">
         {page.cover && (
           <div
-            className="relative h-[200px] w-full"
+            className="relative h-[280px] w-full"
             style={{ background: page.cover }}
             onMouseEnter={() => setIsHoveringCover(true)}
             onMouseLeave={() => setIsHoveringCover(false)}
           >
             {isHoveringCover && (
-              <div className="absolute bottom-3 right-3 flex gap-2">
+              <div className="absolute bottom-4 right-4 flex gap-2">
                 <button
                   onClick={(e) => { e.stopPropagation(); setShowCoverMenu(true); }}
-                  className="bg-white/90 hover:bg-white text-[#37352f] text-xs px-3 py-1.5 rounded shadow"
+                  className="bg-white/95 backdrop-blur-sm hover:bg-white text-[#37352f] text-sm px-4 py-2 rounded-lg shadow-lg font-medium transition-all hover:scale-105"
                 >
                   Изменить обложку
+                </button>
+                <button
+                  onClick={(e) => { e.stopPropagation(); handleRemoveCover(); }}
+                  className="bg-white/95 backdrop-blur-sm hover:bg-white text-[#eb5757] text-sm px-4 py-2 rounded-lg shadow-lg font-medium transition-all hover:scale-105"
+                >
+                  Удалить
                 </button>
               </div>
             )}
@@ -241,13 +272,14 @@ export const PageEditorPage = (): JSX.Element => {
                 </button>
                 
                 {showEmojiPicker && (
-                  <div className="absolute left-0 top-full mt-2 bg-white border border-[#e6e4df] rounded-lg shadow-lg p-3 z-50">
+                  <div className="absolute left-0 top-full mt-2 bg-white border border-[#e6e4df] rounded-lg shadow-xl p-4 z-50 w-[280px]">
+                    <div className="text-xs font-semibold text-[#37352f] mb-3">Выберите иконку</div>
                     <div className="grid grid-cols-7 gap-1">
                       {emojiList.map(emoji => (
                         <button
                           key={emoji}
                           onClick={() => handleIconChange(emoji)}
-                          className="text-2xl p-2 hover:bg-[#efefec] rounded"
+                          className="text-2xl p-2 hover:bg-[#f7f9fb] rounded transition-all hover:scale-110"
                         >
                           {emoji}
                         </button>
@@ -271,39 +303,79 @@ export const PageEditorPage = (): JSX.Element => {
             </div>
 
             {showCoverMenu && (
-              <div 
-                className="absolute bg-white border border-[#e6e4df] rounded-lg shadow-lg p-4 z-50 w-[300px]"
+              <div
+                className="absolute left-0 top-full mt-2 bg-white border border-[#e6e4df] rounded-lg shadow-xl p-4 z-50 w-[360px]"
                 onClick={(e) => e.stopPropagation()}
               >
-                <div className="flex items-center justify-between mb-3">
-                  <span className="text-sm font-medium text-[#37352f]">Обложка</span>
+                <div className="flex items-center justify-between mb-4">
+                  <span className="text-sm font-semibold text-[#37352f]">Обложка страницы</span>
                   {page.cover && (
-                    <button onClick={handleRemoveCover} className="text-xs text-[#eb5757] hover:underline">
+                    <button
+                      onClick={handleRemoveCover}
+                      className="text-xs text-[#eb5757] hover:bg-red-50 px-2 py-1 rounded transition-colors"
+                    >
                       Удалить
                     </button>
                   )}
                 </div>
-                <div className="mb-3">
-                  <div className="text-xs text-[#9b9a97] mb-2">Градиенты</div>
-                  <div className="grid grid-cols-5 gap-2">
+
+                <div className="mb-4">
+                  <button
+                    onClick={() => fileInputRef.current?.click()}
+                    className="w-full py-2 px-3 border-2 border-dashed border-[#e6e4df] rounded-lg hover:border-[#2383e2] hover:bg-[#f7f9fb] transition-all text-sm text-[#37352f] font-medium flex items-center justify-center gap-2"
+                  >
+                    <Image className="w-4 h-4" />
+                    Загрузить изображение
+                  </button>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    className="hidden"
+                  />
+                </div>
+
+                <div className="mb-4">
+                  <div className="text-xs font-medium text-[#37352f] mb-2">Готовые изображения</div>
+                  <div className="grid grid-cols-3 gap-2">
+                    {coverImages.map((image, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => handleCoverChange(`url(${image}) center/cover`)}
+                        className="aspect-video rounded border-2 border-[#e6e4df] hover:border-[#2383e2] overflow-hidden transition-all hover:scale-105"
+                        style={{
+                          backgroundImage: `url(${image})`,
+                          backgroundSize: 'cover',
+                          backgroundPosition: 'center'
+                        }}
+                      />
+                    ))}
+                  </div>
+                </div>
+
+                <div className="mb-4">
+                  <div className="text-xs font-medium text-[#37352f] mb-2">Градиенты</div>
+                  <div className="grid grid-cols-6 gap-2">
                     {coverGradients.map((gradient, idx) => (
                       <button
                         key={idx}
                         onClick={() => handleCoverChange(gradient)}
-                        className="w-10 h-6 rounded border border-[#e6e4df] hover:ring-2 hover:ring-[#2383e2]"
+                        className="aspect-video rounded border-2 border-[#e6e4df] hover:border-[#2383e2] transition-all hover:scale-105"
                         style={{ background: gradient }}
                       />
                     ))}
                   </div>
                 </div>
+
                 <div>
-                  <div className="text-xs text-[#9b9a97] mb-2">Сплошные цвета</div>
+                  <div className="text-xs font-medium text-[#37352f] mb-2">Сплошные цвета</div>
                   <div className="grid grid-cols-8 gap-2">
                     {coverColors.map((color, idx) => (
                       <button
                         key={idx}
                         onClick={() => handleCoverChange(color)}
-                        className="w-6 h-6 rounded border border-[#e6e4df] hover:ring-2 hover:ring-[#2383e2]"
+                        className="w-8 h-8 rounded border-2 border-[#e6e4df] hover:border-[#2383e2] transition-all hover:scale-110"
                         style={{ background: color }}
                       />
                     ))}
