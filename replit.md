@@ -51,27 +51,29 @@ public/              - Static assets
 - **Global Search**: Search pages, blocks, and database records
 
 ## Routes
-- `/` - Home with quick access cards
+- `/` - Home with quick access cards (dynamic favorites, recent pages, databases)
 - `/page/:pageId` - Block-based page editor with covers and breadcrumbs
 - `/database/:databaseId` - Database view with Table/Board/Calendar/List and record modal
 - `/search` - Global search page
 - `/trash` - Archived pages with restore/delete options
+- `/inbox` - Inbox page
+- `/settings` - Settings page
 
 ## Recent Changes (December 2024)
+- Fixed text input reversal bug with uncontrolled contentEditable pattern
+- Made Home page dynamic with real workspace data
+- Simplified sidebar: removed Marketplace, NoteZero AI, NoteZero Apps
+- Cleaned up unused Figma design files and placeholder images
 - Added page cover images (gradients and solid colors)
 - Expanded emoji picker for page icons
 - Added breadcrumb navigation
 - Extended block types: Code, Callout, Toggle, Image
 - Created RecordModal for database record details
-- Implemented collapsible sidebar with state preservation
-- Restructured sidebar with Notion-style sections (Search, Home, Meetings, NoteZero AI, Inbox, Private, Shared, etc.)
 - Created Welcome to NoteZero! onboarding page with checklist
 - Added To Do List database with onboarding tasks
 - Implemented Share panel with invite and copy link functionality
-- Added global search modal (Ctrl+K shortcut)
-- Created floating AI chat widget with message history
+- Created floating AI chat widget with typing indicator
 - Built Template Gallery modal for page creation
-- Added Settings, Marketplace, Inbox, Meetings, and AI pages
 
 ## Development
 - Dev server: `npm run dev` (port 5000)

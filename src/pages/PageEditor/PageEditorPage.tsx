@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Star, MoreHorizontal, MessageSquare, Clock, Image, X, ChevronRight, Share2, Lock, Link, Copy, Check } from "lucide-react";
+import { Star, MoreHorizontal, Image, ChevronRight, Lock, Link, Check } from "lucide-react";
 import { useWorkspace } from "../../store";
 import { BlockEditor } from "../../components/Editor";
 import { Button } from "../../components/ui/button";
@@ -8,7 +8,6 @@ import { Button } from "../../components/ui/button";
 const SharePanel = ({ onClose }: { onClose: () => void }) => {
   const panelRef = useRef<HTMLDivElement>(null);
   const [copied, setCopied] = useState(false);
-  const [accessLevel, setAccessLevel] = useState("view");
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -124,7 +123,7 @@ export const PageEditorPage = (): JSX.Element => {
   }, [page]);
 
   useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
+    const handleClickOutside = () => {
       if (showEmojiPicker || showCoverMenu) {
         setShowEmojiPicker(false);
         setShowCoverMenu(false);

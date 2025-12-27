@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { 
   ChevronRight, Plus, Star, MoreHorizontal, Home, FileText, Database, Trash2, Search, 
-  Copy, Edit2, Sparkles, Inbox, Calendar, Mail, Settings, Store, Users, Video
+  Copy, Edit2, Inbox, Settings, Users
 } from "lucide-react";
 import { useWorkspace } from "../../store";
 import { Page } from "../../store/types";
@@ -270,7 +270,7 @@ const TemplateModal = ({ onClose, onCreate }: TemplateModalProps) => {
               onClick={() => onCreate('page')}
               className="flex flex-col items-center p-4 border border-[#e6e4df] rounded-lg hover:bg-[#f7f6f3] transition-colors"
             >
-              <Sparkles className="w-8 h-8 text-[#9b9a97] mb-2" />
+              <span className="text-2xl mb-2">✨</span>
               <span className="text-sm font-medium text-[#37352f]">Build with AI</span>
             </button>
           </div>
@@ -302,18 +302,11 @@ const TemplateModal = ({ onClose, onCreate }: TemplateModalProps) => {
 export const Sidebar = (): JSX.Element => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { workspace, getRootPages, getFavoritePages, getArchivedPages, createPage, setCurrentPageId, createDatabase } = useWorkspace();
+  const { workspace, getRootPages, getFavoritePages, createPage, setCurrentPageId, createDatabase } = useWorkspace();
   const [showTemplateModal, setShowTemplateModal] = useState(false);
   
   const rootPages = getRootPages();
   const favoritePages = getFavoritePages();
-  const archivedPages = getArchivedPages();
-
-  const handleCreatePage = () => {
-    const newPage = createPage("Untitled");
-    setCurrentPageId(newPage.id);
-    navigate(`/page/${newPage.id}`);
-  };
 
   const handleTemplateCreate = (type: 'page' | 'database' | 'template', templateId?: string) => {
     setShowTemplateModal(false);
@@ -334,19 +327,11 @@ export const Sidebar = (): JSX.Element => {
   const topNavItems = [
     { id: "search", label: "Search", icon: Search, path: "/search" },
     { id: "home", label: "Home", icon: Home, path: "/" },
-    { id: "meetings", label: "Meetings", icon: Video, path: "/meetings" },
-    { id: "ai", label: "NoteZero AI", icon: Sparkles, path: "/ai" },
     { id: "inbox", label: "Inbox", icon: Inbox, path: "/inbox" },
-  ];
-
-  const appItems = [
-    { id: "mail", label: "NoteZero Mail", icon: Mail, path: "/mail" },
-    { id: "calendar", label: "NoteZero Calendar", icon: Calendar, path: "/calendar" },
   ];
 
   const bottomItems = [
     { id: "settings", label: "Settings", icon: Settings, path: "/settings" },
-    { id: "marketplace", label: "Marketplace", icon: Store, path: "/marketplace" },
     { id: "trash", label: "Trash", icon: Trash2, path: "/trash" },
   ];
 
@@ -427,31 +412,6 @@ export const Sidebar = (): JSX.Element => {
             </div>
           </div>
         )}
-
-        <div className="mb-2">
-          <div className="px-4 py-1">
-            <span className="text-[11px] text-[#9b9a97] font-medium uppercase tracking-wide">
-              NoteZero Apps
-            </span>
-          </div>
-          <div className="px-2">
-            {appItems.map((item) => {
-              const isActive = location.pathname === item.path;
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => navigate(item.path)}
-                  className={`w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-left transition-colors ${
-                    isActive ? "bg-[#efefec]" : "hover:bg-[#efefec]"
-                  }`}
-                >
-                  <item.icon className="w-4 h-4 text-[#9b9a97]" />
-                  <span className="text-sm text-[#37352f]">{item.label}</span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
 
         {workspace.databases.length > 0 && (
           <div className="mb-2">
