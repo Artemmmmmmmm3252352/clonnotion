@@ -1,9 +1,81 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Star, MoreHorizontal, MessageSquare, Clock, Image, X, ChevronRight } from "lucide-react";
+import { Star, MoreHorizontal, MessageSquare, Clock, Image, X, ChevronRight, Share2, Lock, Link, Copy, Check } from "lucide-react";
 import { useWorkspace } from "../../store";
 import { BlockEditor } from "../../components/Editor";
 import { Button } from "../../components/ui/button";
+
+const SharePanel = ({ onClose }: { onClose: () => void }) => {
+  const panelRef = useRef<HTMLDivElement>(null);
+  const [copied, setCopied] = useState(false);
+  const [accessLevel, setAccessLevel] = useState("view");
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (panelRef.current && !panelRef.current.contains(e.target as Node)) {
+        onClose();
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [onClose]);
+
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(window.location.href);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <div 
+      ref={panelRef}
+      className="absolute right-0 top-full mt-2 w-80 bg-white border border-[#e6e4df] rounded-lg shadow-xl z-50"
+    >
+      <div className="p-4 border-b border-[#e6e4df]">
+        <div className="flex gap-4 mb-4">
+          <button className="text-sm font-medium text-[#37352f] border-b-2 border-[#37352f] pb-1">Share</button>
+          <button className="text-sm text-[#9b9a97] pb-1">Publish</button>
+        </div>
+        
+        <input
+          type="text"
+          placeholder="Email or group, separated by commas"
+          className="w-full px-3 py-2 text-sm border border-[#e6e4df] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#2383e2]"
+        />
+        <button className="mt-2 px-3 py-1.5 bg-[#2383e2] text-white text-sm rounded-lg hover:bg-[#1a6fc9]">
+          Invite
+        </button>
+      </div>
+
+      <div className="p-4 border-b border-[#e6e4df]">
+        <div className="flex items-center gap-3 mb-3">
+          <div className="w-8 h-8 bg-[#2383e2] rounded-full flex items-center justify-center text-white text-sm font-medium">
+            U
+          </div>
+          <div className="flex-1">
+            <div className="text-sm text-[#37352f]">You</div>
+            <div className="text-xs text-[#9b9a97]">user@example.com</div>
+          </div>
+          <span className="text-xs text-[#9b9a97]">Full access</span>
+        </div>
+      </div>
+
+      <div className="p-4">
+        <div className="flex items-center gap-2 text-sm text-[#37352f] mb-2">
+          <Lock className="w-4 h-4 text-[#9b9a97]" />
+          <span>Only people invited</span>
+        </div>
+        <button 
+          onClick={handleCopyLink}
+          className="flex items-center gap-2 text-sm text-[#2383e2] hover:underline"
+        >
+          {copied ? <Check className="w-4 h-4" /> : <Link className="w-4 h-4" />}
+          {copied ? "Link copied!" : "Copy link"}
+        </button>
+      </div>
+    </div>
+  );
+};
 
 const emojiList = ["📄", "📋", "📝", "📌", "🗂️", "📁", "💡", "🎯", "🚀", "⭐", "💼", "📊", "🏠", "✨", "🎨", "📚", "🔥", "💪", "🌟", "🎉"];
 
@@ -35,6 +107,7 @@ export const PageEditorPage = (): JSX.Element => {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [showCoverMenu, setShowCoverMenu] = useState(false);
   const [isHoveringCover, setIsHoveringCover] = useState(false);
+  const [showSharePanel, setShowSharePanel] = useState(false);
 
   const pagePath = pageId ? getPagePath(pageId) : [];
 
@@ -110,7 +183,18 @@ export const PageEditorPage = (): JSX.Element => {
           ))}
         </div>
         
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1 relative">
+          <div className="relative">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowSharePanel(!showSharePanel)}
+              className="h-7 px-3 text-sm text-[#37352f]"
+            >
+              Share
+            </Button>
+            {showSharePanel && <SharePanel onClose={() => setShowSharePanel(false)} />}
+          </div>
           <Button
             variant="ghost"
             size="sm"
@@ -118,12 +202,6 @@ export const PageEditorPage = (): JSX.Element => {
             className="h-7 px-2"
           >
             <Star className={`w-4 h-4 ${page.isFavorite ? "fill-[#f5c518] text-[#f5c518]" : "text-[#9b9a97]"}`} />
-          </Button>
-          <Button variant="ghost" size="sm" className="h-7 px-2">
-            <Clock className="w-4 h-4 text-[#9b9a97]" />
-          </Button>
-          <Button variant="ghost" size="sm" className="h-7 px-2">
-            <MessageSquare className="w-4 h-4 text-[#9b9a97]" />
           </Button>
           <Button variant="ghost" size="sm" className="h-7 px-2">
             <MoreHorizontal className="w-4 h-4 text-[#9b9a97]" />

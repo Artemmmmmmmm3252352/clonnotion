@@ -5,30 +5,35 @@ const generateId = () => Math.random().toString(36).substr(2, 9);
 
 const defaultPages: Page[] = [
   {
-    id: 'home',
-    title: 'Home',
-    icon: '🏠',
+    id: 'welcome',
+    title: 'Welcome to NoteZero!',
+    icon: '👋',
     parentId: null,
     blocks: [
-      { id: '1', type: 'heading1', content: 'Welcome to NoteZero' },
-      { id: '2', type: 'text', content: 'Start creating pages and organizing your workspace.' },
+      { id: 'w1', type: 'heading1', content: 'Welcome to NoteZero!' },
+      { id: 'w2', type: 'todo', content: 'Create an account with NoteZero', checked: true },
+      { id: 'w3', type: 'todo', content: 'Download the desktop app to unlock offline mode and take NoteZero with you wherever you go', checked: true },
+      { id: 'w4', type: 'todo', content: 'Click anywhere below and type / to see what you can create — headers, tables, to-do\'s, etc.', checked: true },
+      { id: 'w5', type: 'todo', content: 'Type /page to add a new page and nest anything, anywhere', checked: false },
+      { id: 'w6', type: 'todo', content: 'Find, organize, and add new pages using the sidebar to the left ⭐', checked: false },
+      { id: 'w7', type: 'todo', content: 'Check out the To Do List we added for you with more tips and tricks to best use NoteZero', checked: false },
+      { id: 'w8', type: 'todo', content: 'Make a new page and type /meet: to capture meeting notes and thoughts effortlessly', checked: false },
+      { id: 'w9', type: 'todo', content: 'Click on the 🤖 NoteZero AI face in the bottom right of your screen to see what Agent can do', checked: false },
+      { id: 'w10', type: 'toggle', content: 'This is a toggle block. Click the little triangle to see a few more useful tips!' },
     ],
-    isFavorite: true,
+    isFavorite: false,
     isArchived: false,
     createdAt: new Date(),
     updatedAt: new Date(),
   },
   {
-    id: 'getting-started',
-    title: 'Getting Started',
-    icon: '🚀',
+    id: 'todo-list',
+    title: 'To Do List',
+    icon: '✅',
     parentId: null,
     blocks: [
-      { id: '3', type: 'heading1', content: 'Getting Started' },
-      { id: '4', type: 'text', content: 'This is your first page. Click anywhere to start typing.' },
-      { id: '5', type: 'todo', content: 'Create your first page', checked: false },
-      { id: '6', type: 'todo', content: 'Add some blocks', checked: false },
-      { id: '7', type: 'todo', content: 'Explore the sidebar', checked: true },
+      { id: 't1', type: 'heading1', content: 'To Do List' },
+      { id: 't2', type: 'text', content: 'Your tasks and action items organized in one place.' },
     ],
     isFavorite: false,
     isArchived: false,
@@ -57,8 +62,8 @@ const defaultPages: Page[] = [
 
 const defaultDatabases: Database[] = [
   {
-    id: 'tasks-db',
-    name: 'Tasks',
+    id: 'todo-db',
+    name: 'To Do List',
     icon: '✅',
     properties: [
       { id: 'name', name: 'Name', type: 'text' },
@@ -68,26 +73,19 @@ const defaultDatabases: Database[] = [
         type: 'select',
         options: [
           { id: 'todo', name: 'To Do', color: 'bg-[#efefec] text-[#65645f]' },
-          { id: 'in-progress', name: 'In Progress', color: 'bg-[#dbeafe] text-[#1e40af]' },
           { id: 'done', name: 'Done', color: 'bg-[#d3f5e1] text-[#0d7d3d]' },
-        ]
-      },
-      { 
-        id: 'priority', 
-        name: 'Priority', 
-        type: 'select',
-        options: [
-          { id: 'low', name: 'Low', color: 'bg-[#dbeafe] text-[#1e40af]' },
-          { id: 'medium', name: 'Medium', color: 'bg-[#fef3c7] text-[#b45309]' },
-          { id: 'high', name: 'High', color: 'bg-[#ffd4d4] text-[#c41e1e]' },
         ]
       },
       { id: 'due-date', name: 'Due Date', type: 'date' },
     ],
     rows: [
-      { id: 'task1', properties: { name: 'Research Competitors', status: 'in-progress', priority: 'high', 'due-date': '2024-10-15' }, pageId: '' },
-      { id: 'task2', properties: { name: 'Draft Roadmap', status: 'todo', priority: 'medium', 'due-date': '2024-11-01' }, pageId: '' },
-      { id: 'task3', properties: { name: 'UI Design', status: 'done', priority: 'low', 'due-date': '2024-09-30' }, pageId: '' },
+      { id: 'task1', properties: { name: 'Check the box to mark items as done', status: 'done', 'due-date': 'Today' }, pageId: '' },
+      { id: 'task2', properties: { name: 'Click the due date to change it', status: 'todo', 'due-date': 'Today' }, pageId: '' },
+      { id: 'task3', properties: { name: 'Click me to see even more detail', status: 'todo', 'due-date': 'Today' }, pageId: '' },
+      { id: 'task4', properties: { name: 'Click the blue New button to add a task', status: 'todo', 'due-date': 'Today' }, pageId: '' },
+      { id: 'task5', properties: { name: 'Click me to learn how to hide checked items', status: 'todo', 'due-date': 'Today' }, pageId: '' },
+      { id: 'task6', properties: { name: 'See finished items in the "Done" view', status: 'todo', 'due-date': 'Today' }, pageId: '' },
+      { id: 'task7', properties: { name: 'Click me to learn how to see your content your way', status: 'todo', 'due-date': 'Tomorrow' }, pageId: '' },
     ],
     createdAt: new Date(),
     updatedAt: new Date(),
