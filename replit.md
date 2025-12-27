@@ -31,17 +31,24 @@ public/              - Static assets
 ```
 
 ## Core Features
-- **Block Editor**: 9 block types (text, h1-h3, lists, todo, quote, divider)
+- **Block Editor**: 9 block types (text, h1-h3, lists, todo, quote, divider) with color options
 - **Slash Commands**: Type "/" to open block type menu
+- **Block Menu**: Hover to access Duplicate, Turn into, Color, Delete actions
+- **Drag-and-Drop**: Reorder blocks with grip handle
 - **Page Tree**: Hierarchical pages with expand/collapse
+- **Page Context Menu**: Rename, Duplicate, Add to favorites, Delete pages
 - **Favorites**: Star pages to pin in sidebar
-- **Databases**: Table view with typed properties
+- **Databases**: Multiple views - Table, Board (Kanban), Calendar, List
+- **Filter & Sort**: Dynamic filtering and sorting for database views
+- **Trash**: Restore or permanently delete archived pages
 - **Global Search**: Search pages, blocks, and database records
 
 ## Routes
 - `/` - Home with quick access cards
 - `/page/:pageId` - Block-based page editor
+- `/database/:databaseId` - Database view with Table/Board/Calendar/List
 - `/search` - Global search page
+- `/trash` - Archived pages with restore/delete options
 
 ## Development
 - Dev server: `npm run dev` (port 5000)
