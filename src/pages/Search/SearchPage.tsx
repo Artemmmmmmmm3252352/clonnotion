@@ -18,7 +18,20 @@ export const SearchPage = (): JSX.Element => {
   );
 
   const filteredDatabases = workspace.databases.filter(db =>
-    db.name.toLowerCase().includes(query.toLowerCase())
+    db.name.toLowerCase().includes(query.toLowerCase()) ||
+    db.rows.some(row => 
+      Object.values(row.properties).some(val => 
+        String(val).toLowerCase().includes(query.toLowerCase())
+      )
+    )
+  );
+
+  const matchingRows = workspace.databases.flatMap(db =>
+    db.rows.filter(row =>
+      Object.values(row.properties).some(val =>
+        String(val).toLowerCase().includes(query.toLowerCase())
+      )
+    ).map(row => ({ ...row, databaseName: db.name, databaseId: db.id }))
   );
 
   const highlightText = (text: string, highlight: string) => {
@@ -112,7 +125,32 @@ export const SearchPage = (): JSX.Element => {
               </div>
             )}
 
-            {filteredPages.length === 0 && filteredDatabases.length === 0 && (
+            {matchingRows.length > 0 && (
+              <div>
+                <h3 className="text-xs text-[#9b9a97] font-medium uppercase tracking-wide mb-3">
+                  Database Records
+                </h3>
+                <div className="space-y-2">
+                  {matchingRows.map(row => (
+                    <Card
+                      key={row.id}
+                      className="bg-white border border-[#e6e4df] hover:bg-[#fafaf9] cursor-pointer transition-colors rounded-lg"
+                    >
+                      <CardContent className="p-4">
+                        <div className="text-[15px] text-[#37352f] font-medium">
+                          {highlightText(String(row.properties.name || row.properties.Name || 'Untitled'), query)}
+                        </div>
+                        <div className="text-xs text-[#9b9a97] mt-1">
+                          in {row.databaseName}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {filteredPages.length === 0 && filteredDatabases.length === 0 && matchingRows.length === 0 && (
               <div className="text-center py-12">
                 <Search className="w-12 h-12 text-[#d3d1cb] mx-auto mb-4" />
                 <h3 className="text-lg text-[#37352f] font-medium mb-2">No results found</h3>

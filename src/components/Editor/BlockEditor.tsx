@@ -108,10 +108,17 @@ export const BlockEditor = ({ pageId, block, onFocus }: BlockEditorProps) => {
   };
 
   const handleBlockTypeSelect = (type: BlockType) => {
-    updateBlock(pageId, block.id, { type, content: "" });
+    const defaults: Partial<Block> = { type, content: "" };
+    if (type === "todo") {
+      defaults.checked = false;
+    }
+    updateBlock(pageId, block.id, defaults);
     if (contentRef.current) {
       contentRef.current.innerText = "";
+      contentRef.current.focus();
     }
+    setShowSlashMenu(false);
+    setSlashFilter("");
   };
 
   const handleCheckboxChange = (checked: boolean) => {
