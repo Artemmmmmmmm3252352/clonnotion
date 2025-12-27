@@ -124,6 +124,7 @@ interface WorkspaceContextType {
   getChildPages: (parentId: string) => Page[];
   getFavoritePages: () => Page[];
   getArchivedPages: () => Page[];
+  createDatabase: (name: string) => Database;
 }
 
 const WorkspaceContext = createContext<WorkspaceContextType | null>(null);
@@ -339,6 +340,35 @@ export const WorkspaceProvider = ({ children }: { children: ReactNode }) => {
     return workspace.pages.filter(page => page.isArchived);
   }, [workspace.pages]);
 
+  const createDatabase = useCallback((name: string): Database => {
+    const newDatabase: Database = {
+      id: generateId(),
+      name: name || 'Untitled Database',
+      icon: '📋',
+      properties: [
+        { id: 'name', name: 'Name', type: 'text' },
+        { 
+          id: 'status', 
+          name: 'Status', 
+          type: 'select',
+          options: [
+            { id: 'todo', name: 'To Do', color: 'bg-[#efefec] text-[#65645f]' },
+            { id: 'in-progress', name: 'In Progress', color: 'bg-[#dbeafe] text-[#1e40af]' },
+            { id: 'done', name: 'Done', color: 'bg-[#d3f5e1] text-[#0d7d3d]' },
+          ]
+        },
+      ],
+      rows: [],
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    setWorkspace(prev => ({
+      ...prev,
+      databases: [...prev.databases, newDatabase],
+    }));
+    return newDatabase;
+  }, []);
+
   return (
     <WorkspaceContext.Provider value={{
       workspace,
@@ -363,6 +393,7 @@ export const WorkspaceProvider = ({ children }: { children: ReactNode }) => {
       getChildPages,
       getFavoritePages,
       getArchivedPages,
+      createDatabase,
     }}>
       {children}
     </WorkspaceContext.Provider>
