@@ -4,6 +4,8 @@ import { Table, Columns, Calendar, List, Plus, Filter, ArrowUpDown, ChevronDown,
 import { useWorkspace } from "../../store";
 import { Button } from "../../components/ui/button";
 import { Input } from "../../components/ui/input";
+import { RecordModal } from "../../components/RecordModal";
+import { DatabaseRow } from "../../store/types";
 
 type ViewType = "table" | "board" | "calendar" | "list";
 
@@ -33,6 +35,7 @@ export const DatabasePage = (): JSX.Element => {
   const [showFilterMenu, setShowFilterMenu] = useState(false);
   const [showSortMenu, setShowSortMenu] = useState(false);
   const [showViewMenu, setShowViewMenu] = useState(false);
+  const [selectedRow, setSelectedRow] = useState<DatabaseRow | null>(null);
 
   if (!database) {
     return (
@@ -111,7 +114,11 @@ export const DatabasePage = (): JSX.Element => {
         </thead>
         <tbody>
           {filteredRows.map(row => (
-            <tr key={row.id} className="border-b border-[#e6e4df] hover:bg-[#f7f6f3]">
+            <tr 
+              key={row.id} 
+              className="border-b border-[#e6e4df] hover:bg-[#f7f6f3] cursor-pointer"
+              onClick={() => setSelectedRow(row)}
+            >
               {database.properties.map(prop => {
                 const value = row.properties[prop.id];
                 
@@ -167,7 +174,11 @@ export const DatabasePage = (): JSX.Element => {
             </div>
             <div className="space-y-2">
               {column.rows.map(row => (
-                <div key={row.id} className="bg-white rounded-lg p-3 shadow-sm border border-[#e6e4df]">
+                <div 
+                  key={row.id} 
+                  className="bg-white rounded-lg p-3 shadow-sm border border-[#e6e4df] cursor-pointer hover:shadow-md transition-shadow"
+                  onClick={() => setSelectedRow(row)}
+                >
                   <div className="text-sm text-[#37352f] font-medium">
                     {row.properties.name || row.properties.Name || "Untitled"}
                   </div>
@@ -246,7 +257,11 @@ export const DatabasePage = (): JSX.Element => {
                   {day}
                 </div>
                 {dayRows.slice(0, 3).map(row => (
-                  <div key={row.id} className="text-xs text-[#37352f] truncate bg-[#f7f6f3] rounded px-1 py-0.5 mb-1">
+                  <div 
+                    key={row.id} 
+                    className="text-xs text-[#37352f] truncate bg-[#f7f6f3] rounded px-1 py-0.5 mb-1 cursor-pointer hover:bg-[#e6e4df]"
+                    onClick={() => setSelectedRow(row)}
+                  >
                     {row.properties.name || row.properties.Name || "Untitled"}
                   </div>
                 ))}
@@ -264,7 +279,11 @@ export const DatabasePage = (): JSX.Element => {
   const renderListView = () => (
     <div className="p-4 space-y-2">
       {filteredRows.map(row => (
-        <div key={row.id} className="flex items-center gap-4 p-3 bg-white border border-[#e6e4df] rounded-lg hover:bg-[#f7f6f3]">
+        <div 
+          key={row.id} 
+          className="flex items-center gap-4 p-3 bg-white border border-[#e6e4df] rounded-lg hover:bg-[#f7f6f3] cursor-pointer"
+          onClick={() => setSelectedRow(row)}
+        >
           <div className="flex-1 text-sm text-[#37352f] font-medium">
             {row.properties.name || row.properties.Name || "Untitled"}
           </div>
@@ -460,6 +479,14 @@ export const DatabasePage = (): JSX.Element => {
         {currentView === "calendar" && renderCalendarView()}
         {currentView === "list" && renderListView()}
       </main>
+
+      {selectedRow && (
+        <RecordModal
+          database={database}
+          row={selectedRow}
+          onClose={() => setSelectedRow(null)}
+        />
+      )}
     </div>
   );
 };
