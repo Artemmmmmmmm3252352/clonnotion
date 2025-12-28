@@ -74,7 +74,8 @@ export const WorkspaceProvider = ({ children }: { children: ReactNode }) => {
         throw error;
       }
 
-      console.log('[WorkspaceContext] Loaded pages:', data?.length);
+      console.log('[WorkspaceContext] Loaded pages from DB:', data?.length);
+      console.log('[WorkspaceContext] Raw pages data:', data);
 
       const transformedPages: Page[] = (data || []).map(p => ({
         id: p.id,
@@ -179,7 +180,10 @@ export const WorkspaceProvider = ({ children }: { children: ReactNode }) => {
         updatedAt: new Date(data.updated_at),
       };
 
-      setPages(prev => [...prev, newPage]);
+      setPages(prev => {
+        console.log('[WorkspaceContext] Adding page to state. Current pages:', prev.length, 'New page:', newPage.id);
+        return [...prev, newPage];
+      });
       return newPage;
     } catch (error) {
       console.error('[WorkspaceContext] Exception creating page:', error);
@@ -595,7 +599,9 @@ export const WorkspaceProvider = ({ children }: { children: ReactNode }) => {
   }, [pages]);
 
   const getRootPages = useCallback(() => {
-    return pages.filter(page => page.parentId === null && !page.isArchived);
+    const rootPages = pages.filter(page => page.parentId === null && !page.isArchived);
+    console.log('[WorkspaceContext] getRootPages:', rootPages.length, 'from', pages.length, 'total pages');
+    return rootPages;
   }, [pages]);
 
   const getChildPages = useCallback((parentId: string) => {

@@ -312,6 +312,8 @@ export const Sidebar = (): JSX.Element => {
   const rootPages = getRootPages();
   const favoritePages = getFavoritePages();
 
+  console.log('[Sidebar] Rendering with', rootPages.length, 'root pages');
+
   const handleSignOut = async () => {
     await signOut();
     navigate('/login');
