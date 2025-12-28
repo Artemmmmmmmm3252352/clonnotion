@@ -14,25 +14,40 @@ export const WorkspaceSwitcher: React.FC = () => {
   const handleCreateWorkspace = async () => {
     if (!newWorkspaceName.trim()) {
       console.log('[WorkspaceSwitcher] Empty workspace name');
+      alert('Пожалуйста, введите название workspace');
       return;
     }
 
     console.log('[WorkspaceSwitcher] Creating workspace:', newWorkspaceName);
     setCreating(true);
     const slug = newWorkspaceName.toLowerCase().replace(/\s+/g, '-') + '-' + Date.now();
-    const { error } = await createWorkspace(newWorkspaceName, slug);
 
-    if (error) {
-      console.error('[WorkspaceSwitcher] Error creating workspace:', error);
-      alert(`Ошибка создания workspace: ${error.message}`);
-    } else {
-      console.log('[WorkspaceSwitcher] Workspace created successfully');
-      setNewWorkspaceName('');
-      setShowCreateForm(false);
-      setIsOpen(false);
+    try {
+      const { error } = await createWorkspace(newWorkspaceName, slug);
+
+      if (error) {
+        console.error('[WorkspaceSwitcher] Error creating workspace:', error);
+
+        // Show user-friendly error message
+        if (error.message.includes('No active session')) {
+          alert('Сессия истекла. Пожалуйста, войдите заново.');
+        } else if (error.message.includes('row-level security')) {
+          alert('Ошибка прав доступа. Попробуйте выйти и войти заново.');
+        } else {
+          alert(`Ошибка создания workspace: ${error.message}`);
+        }
+      } else {
+        console.log('[WorkspaceSwitcher] Workspace created successfully');
+        setNewWorkspaceName('');
+        setShowCreateForm(false);
+        setIsOpen(false);
+      }
+    } catch (error) {
+      console.error('[WorkspaceSwitcher] Exception:', error);
+      alert('Произошла ошибка. Попробуйте еще раз.');
+    } finally {
+      setCreating(false);
     }
-
-    setCreating(false);
   };
 
   if (loading) {

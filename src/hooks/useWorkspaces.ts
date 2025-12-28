@@ -116,6 +116,7 @@ export const useWorkspaces = () => {
     console.log('[useWorkspaces] Creating workspace:', { name, slug, owner_id: user.id });
 
     try {
+      // Create workspace - trigger will automatically add owner to workspace_members
       const { data: workspace, error: workspaceError } = await supabase
         .from('workspaces')
         .insert({
@@ -132,23 +133,10 @@ export const useWorkspaces = () => {
         throw workspaceError;
       }
 
-      console.log('[useWorkspaces] Workspace created:', workspace);
+      console.log('[useWorkspaces] Workspace created successfully:', workspace);
+      console.log('[useWorkspaces] Trigger should have added owner to workspace_members');
 
-      const { error: memberError } = await supabase
-        .from('workspace_members')
-        .insert({
-          workspace_id: workspace.id,
-          user_id: user.id,
-          role: 'owner',
-        });
-
-      if (memberError) {
-        console.error('[useWorkspaces] Error adding member:', memberError);
-        throw memberError;
-      }
-
-      console.log('[useWorkspaces] Member added successfully');
-
+      // Reload workspaces to get the new one
       await loadWorkspaces();
       console.log('[useWorkspaces] Workspaces reloaded');
       return { data: workspace, error: null };
