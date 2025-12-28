@@ -105,36 +105,28 @@ export const useWorkspaces = () => {
       return { error: new Error('No active session. Please log in again.') };
     }
 
-    // Test auth.uid() by calling a test function
-    try {
-      const { data: testAuth, error: testError } = await supabase.rpc('get_current_user_id');
-      console.log('[useWorkspaces] Test auth.uid():', testAuth, 'Error:', testError);
-    } catch (e) {
-      console.log('[useWorkspaces] Test function not available (this is OK)');
-    }
-
     console.log('[useWorkspaces] Creating workspace:', { name, slug, owner_id: user.id });
 
     try {
-      // Create workspace - trigger will automatically add owner to workspace_members
-      const { data: workspace, error: workspaceError } = await supabase
-        .from('workspaces')
-        .insert({
-          name,
-          slug,
-          owner_id: user.id,
-          is_personal: false,
-        })
-        .select()
-        .single();
+      // Use RPC function to create workspace (bypasses RLS issues)
+      const { data: workspaceJson, error: workspaceError } = await supabase.rpc(
+        'create_workspace_for_user',
+        {
+          workspace_name: name,
+          workspace_slug: slug,
+          user_id: user.id,
+        }
+      );
 
       if (workspaceError) {
         console.error('[useWorkspaces] Error creating workspace:', workspaceError);
         throw workspaceError;
       }
 
-      console.log('[useWorkspaces] Workspace created successfully:', workspace);
+      console.log('[useWorkspaces] Workspace created successfully:', workspaceJson);
       console.log('[useWorkspaces] Trigger should have added owner to workspace_members');
+
+      const workspace = workspaceJson as any;
 
       // Reload workspaces to get the new one
       await loadWorkspaces();
