@@ -1,0 +1,209 @@
+import { useState, useEffect } from 'react';
+import { supabase } from '../lib/supabase';
+import { useAuth } from '../contexts/AuthContext';
+
+interface Workspace {
+  id: string;
+  name: string;
+  slug: string;
+  owner_id: string;
+  is_personal: boolean;
+  created_at: string;
+  updated_at: string;
+  role?: string;
+}
+
+interface WorkspaceMember {
+  id: string;
+  workspace_id: string;
+  user_id: string;
+  role: string;
+  joined_at: string;
+  profile: {
+    email: string;
+    full_name: string | null;
+    avatar_url: string | null;
+  };
+}
+
+export const useWorkspaces = () => {
+  const { user } = useAuth();
+  const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
+  const [currentWorkspace, setCurrentWorkspace] = useState<Workspace | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (user) {
+      loadWorkspaces();
+    }
+  }, [user]);
+
+  const loadWorkspaces = async () => {
+    if (!user) return;
+
+    try {
+      const { data: memberships, error } = await supabase
+        .from('workspace_members')
+        .select('workspace_id, role, workspaces(*)')
+        .eq('user_id', user.id);
+
+      if (error) throw error;
+
+      const workspaceList = memberships?.map((m: any) => ({
+        ...m.workspaces,
+        role: m.role,
+      })) || [];
+
+      setWorkspaces(workspaceList);
+
+      if (workspaceList.length > 0 && !currentWorkspace) {
+        const personal = workspaceList.find((w: Workspace) => w.is_personal);
+        setCurrentWorkspace(personal || workspaceList[0]);
+      }
+    } catch (error) {
+      console.error('Error loading workspaces:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const createWorkspace = async (name: string, slug: string) => {
+    if (!user) return { error: new Error('No user logged in') };
+
+    try {
+      const { data: workspace, error: workspaceError } = await supabase
+        .from('workspaces')
+        .insert({
+          name,
+          slug,
+          owner_id: user.id,
+          is_personal: false,
+        })
+        .select()
+        .single();
+
+      if (workspaceError) throw workspaceError;
+
+      const { error: memberError } = await supabase
+        .from('workspace_members')
+        .insert({
+          workspace_id: workspace.id,
+          user_id: user.id,
+          role: 'owner',
+        });
+
+      if (memberError) throw memberError;
+
+      await loadWorkspaces();
+      return { data: workspace, error: null };
+    } catch (error) {
+      return { error: error as Error };
+    }
+  };
+
+  const switchWorkspace = (workspace: Workspace) => {
+    setCurrentWorkspace(workspace);
+  };
+
+  const getWorkspaceMembers = async (workspaceId: string): Promise<WorkspaceMember[]> => {
+    try {
+      const { data, error } = await supabase
+        .from('workspace_members')
+        .select(`
+          id,
+          workspace_id,
+          user_id,
+          role,
+          joined_at,
+          profiles:user_id (
+            email,
+            full_name,
+            avatar_url
+          )
+        `)
+        .eq('workspace_id', workspaceId);
+
+      if (error) throw error;
+
+      return data.map((m: any) => ({
+        ...m,
+        profile: m.profiles,
+      })) || [];
+    } catch (error) {
+      console.error('Error loading workspace members:', error);
+      return [];
+    }
+  };
+
+  const updateMemberRole = async (memberId: string, role: string) => {
+    try {
+      const { error } = await supabase
+        .from('workspace_members')
+        .update({ role })
+        .eq('id', memberId);
+
+      if (error) throw error;
+      return { error: null };
+    } catch (error) {
+      return { error: error as Error };
+    }
+  };
+
+  const removeMember = async (memberId: string) => {
+    try {
+      const { error } = await supabase
+        .from('workspace_members')
+        .delete()
+        .eq('id', memberId);
+
+      if (error) throw error;
+      return { error: null };
+    } catch (error) {
+      return { error: error as Error };
+    }
+  };
+
+  const inviteMember = async (workspaceId: string, email: string, role: string) => {
+    if (!user) return { error: new Error('No user logged in') };
+
+    try {
+      const apiUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/send-invitation`;
+
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${(await supabase.auth.getSession()).data.session?.access_token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          role,
+          workspaceId,
+        }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to send invitation');
+      }
+
+      const data = await response.json();
+      return { data, error: null };
+    } catch (error) {
+      return { error: error as Error };
+    }
+  };
+
+  return {
+    workspaces,
+    currentWorkspace,
+    loading,
+    loadWorkspaces,
+    createWorkspace,
+    switchWorkspace,
+    getWorkspaceMembers,
+    updateMemberRole,
+    removeMember,
+    inviteMember,
+  };
+};

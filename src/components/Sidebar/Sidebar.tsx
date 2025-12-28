@@ -1,10 +1,14 @@
 import { useState, useRef, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { 
-  ChevronRight, Plus, Star, MoreHorizontal, Home, FileText, Database, Trash2, Search, 
-  Copy, Edit2, Inbox, Settings, Users
+import {
+  ChevronRight, Plus, Star, MoreHorizontal, Home, FileText, Database, Trash2, Search,
+  Copy, Edit2, Inbox, Settings, Users, Share2, LogOut
 } from "lucide-react";
 import { useWorkspace } from "../../store";
+import { useAuth } from "../../contexts/AuthContext";
+import { useWorkspaces } from "../../hooks/useWorkspaces";
+import { WorkspaceSwitcher } from "../WorkspaceSwitcher";
+import { ShareModal } from "../ShareModal";
 import { Page } from "../../store/types";
 
 interface PageMenuProps {
@@ -303,10 +307,18 @@ export const Sidebar = (): JSX.Element => {
   const navigate = useNavigate();
   const location = useLocation();
   const { workspace, getRootPages, getFavoritePages, createPage, setCurrentPageId, createDatabase } = useWorkspace();
+  const { signOut, profile } = useAuth();
+  const { currentWorkspace } = useWorkspaces();
   const [showTemplateModal, setShowTemplateModal] = useState(false);
-  
+  const [showShareModal, setShowShareModal] = useState(false);
+
   const rootPages = getRootPages();
   const favoritePages = getFavoritePages();
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/login');
+  };
 
   const handleTemplateCreate = (type: 'page' | 'database' | 'template', templateId?: string) => {
     setShowTemplateModal(false);
@@ -337,9 +349,12 @@ export const Sidebar = (): JSX.Element => {
 
   return (
     <aside className="w-60 h-full flex flex-col bg-[#f7f6f3] border-r border-[#e6e4df] overflow-hidden">
-      <header className="flex items-center gap-2 px-3 py-3 border-b border-[#e6e4df]">
-        <span className="text-lg">📝</span>
-        <h1 className="text-sm font-semibold text-[#37352f] flex-1">NoteZero</h1>
+      <header className="px-3 py-3 border-b border-[#e6e4df] space-y-2">
+        <div className="flex items-center gap-2">
+          <span className="text-lg">📝</span>
+          <h1 className="text-sm font-semibold text-[#37352f] flex-1">NoteZero</h1>
+        </div>
+        <WorkspaceSwitcher />
       </header>
 
       <div className="flex-1 overflow-y-auto py-2">
@@ -454,22 +469,42 @@ export const Sidebar = (): JSX.Element => {
         })}
       </div>
 
-      <div className="px-3 py-3 border-t border-[#e6e4df]">
+      <div className="px-3 py-3 border-t border-[#e6e4df] space-y-2">
         <button
+          onClick={() => currentWorkspace && setShowShareModal(true)}
           className="w-full flex items-center gap-2 px-2 py-2 rounded-lg bg-[#f0f0ee] hover:bg-[#e6e4df] text-left transition-colors"
         >
-          <Users className="w-4 h-4 text-[#9b9a97]" />
+          <Share2 className="w-4 h-4 text-[#9b9a97]" />
           <div className="flex-1">
-            <div className="text-xs text-[#9b9a97]">Пригласить участников</div>
-            <div className="text-[10px] text-[#9b9a97]">Работайте вместе с командой</div>
+            <div className="text-xs text-[#37352f] font-medium">Share workspace</div>
+            <div className="text-[10px] text-[#9b9a97]">Invite team members</div>
+          </div>
+        </button>
+
+        <button
+          onClick={handleSignOut}
+          className="w-full flex items-center gap-2 px-2 py-2 rounded-lg hover:bg-[#efefec] text-left transition-colors"
+        >
+          <LogOut className="w-4 h-4 text-[#9b9a97]" />
+          <div className="flex-1">
+            <div className="text-xs text-[#37352f]">{profile?.full_name || profile?.email}</div>
+            <div className="text-[10px] text-[#9b9a97]">Sign out</div>
           </div>
         </button>
       </div>
 
       {showTemplateModal && (
-        <TemplateModal 
-          onClose={() => setShowTemplateModal(false)} 
+        <TemplateModal
+          onClose={() => setShowTemplateModal(false)}
           onCreate={handleTemplateCreate}
+        />
+      )}
+
+      {showShareModal && currentWorkspace && (
+        <ShareModal
+          isOpen={showShareModal}
+          onClose={() => setShowShareModal(false)}
+          workspaceId={currentWorkspace.id}
         />
       )}
     </aside>
