@@ -34,30 +34,30 @@ const PageMenu = ({ page, onClose, position }: PageMenuProps) => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [onClose]);
 
-  const handleRename = () => {
+  const handleRename = async () => {
     if (newTitle.trim()) {
-      updatePage(page.id, { title: newTitle.trim() });
+      await updatePage(page.id, { title: newTitle.trim() });
     }
     setIsRenaming(false);
     onClose();
   };
 
-  const handleDuplicate = () => {
-    const newPage = duplicatePage(page.id);
+  const handleDuplicate = async () => {
+    const newPage = await duplicatePage(page.id);
     if (newPage) {
       navigate(`/page/${newPage.id}`);
     }
     onClose();
   };
 
-  const handleDelete = () => {
-    deletePage(page.id);
+  const handleDelete = async () => {
+    await deletePage(page.id);
     navigate("/");
     onClose();
   };
 
-  const handleFavorite = () => {
-    toggleFavorite(page.id);
+  const handleFavorite = async () => {
+    await toggleFavorite(page.id);
     onClose();
   };
 
@@ -178,9 +178,9 @@ const PageItem = ({ page, level }: PageItemProps) => {
           <div className="flex items-center gap-0.5">
             <button
               className="w-5 h-5 flex items-center justify-center rounded hover:bg-[#ddd]"
-              onClick={(e) => {
+              onClick={async (e) => {
                 e.stopPropagation();
-                toggleFavorite(page.id);
+                await toggleFavorite(page.id);
               }}
             >
               <Star className={`w-3 h-3 ${page.isFavorite ? "fill-[#f5c518] text-[#f5c518]" : "text-[#9b9a97]"}`} />
@@ -428,7 +428,7 @@ export const Sidebar = (): JSX.Element => {
           </div>
         )}
 
-        {workspace.databases.length > 0 && (
+        {false && (
           <div className="mb-2">
             <div className="px-4 py-1">
               <span className="text-[11px] text-[#9b9a97] font-medium uppercase tracking-wide">
@@ -436,7 +436,7 @@ export const Sidebar = (): JSX.Element => {
               </span>
             </div>
             <div className="px-2">
-              {workspace.databases.map(db => (
+              {[].map((db: any) => (
                 <button
                   key={db.id}
                   onClick={() => navigate(`/database/${db.id}`)}
@@ -470,16 +470,18 @@ export const Sidebar = (): JSX.Element => {
       </div>
 
       <div className="px-3 py-3 border-t border-[#e6e4df] space-y-2">
-        <button
-          onClick={() => currentWorkspace && setShowShareModal(true)}
-          className="w-full flex items-center gap-2 px-2 py-2 rounded-lg bg-[#f0f0ee] hover:bg-[#e6e4df] text-left transition-colors"
-        >
-          <Share2 className="w-4 h-4 text-[#9b9a97]" />
-          <div className="flex-1">
-            <div className="text-xs text-[#37352f] font-medium">Share workspace</div>
-            <div className="text-[10px] text-[#9b9a97]">Invite team members</div>
-          </div>
-        </button>
+        {currentWorkspace && (
+          <button
+            onClick={() => setShowShareModal(true)}
+            className="w-full flex items-center gap-2 px-2 py-2 rounded-lg bg-[#f0f0ee] hover:bg-[#e6e4df] text-left transition-colors"
+          >
+            <Share2 className="w-4 h-4 text-[#9b9a97]" />
+            <div className="flex-1">
+              <div className="text-xs text-[#37352f] font-medium">Share workspace</div>
+              <div className="text-[10px] text-[#9b9a97]">Invite team members</div>
+            </div>
+          </button>
+        )}
 
         <button
           onClick={handleSignOut}
@@ -487,7 +489,7 @@ export const Sidebar = (): JSX.Element => {
         >
           <LogOut className="w-4 h-4 text-[#9b9a97]" />
           <div className="flex-1">
-            <div className="text-xs text-[#37352f]">{profile?.full_name || profile?.email}</div>
+            <div className="text-xs text-[#37352f]">{profile?.full_name || profile?.email || 'User'}</div>
             <div className="text-[10px] text-[#9b9a97]">Sign out</div>
           </div>
         </button>

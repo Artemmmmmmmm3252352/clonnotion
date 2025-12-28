@@ -223,7 +223,7 @@ const AIChat = ({ onClose }: { onClose: () => void }) => {
 
 const GlobalSearch = ({ onClose }: { onClose: () => void }) => {
   const [query, setQuery] = useState("");
-  const { workspace } = useWorkspace();
+  const { pages } = useWorkspace();
   const navigate = useNavigate();
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -231,13 +231,11 @@ const GlobalSearch = ({ onClose }: { onClose: () => void }) => {
     inputRef.current?.focus();
   }, []);
 
-  const filteredPages = workspace.pages.filter(p => 
+  const filteredPages = pages.filter(p =>
     !p.isArchived && p.title.toLowerCase().includes(query.toLowerCase())
   );
 
-  const filteredDatabases = workspace.databases.filter(d =>
-    d.name.toLowerCase().includes(query.toLowerCase())
-  );
+  const filteredDatabases: any[] = [];
 
   const handleSelect = (type: 'page' | 'database', id: string) => {
     onClose();

@@ -6,17 +6,17 @@ import { Card, CardContent } from "../../components/ui/card";
 import { useWorkspace } from "../../store";
 
 export const HomePage = (): JSX.Element => {
-  const { workspace, createPage } = useWorkspace();
+  const { pages, createPage } = useWorkspace();
   const navigate = useNavigate();
 
-  const favoritePages = workspace.pages.filter(p => p.isFavorite && !p.isArchived);
+  const favoritePages = pages.filter(p => p.isFavorite && !p.isArchived);
 
-  const recentPages = [...workspace.pages]
+  const recentPages = [...pages]
     .filter(p => !p.isArchived)
     .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
     .slice(0, 5);
 
-  const databases = workspace.databases;
+  const databases: any[] = [];
 
   const handlePageClick = (pageId: string) => {
     navigate(`/page/${pageId}`);
@@ -26,9 +26,11 @@ export const HomePage = (): JSX.Element => {
     navigate(`/database/${dbId}`);
   };
 
-  const handleNewPage = () => {
-    const newPage = createPage("Без названия");
-    navigate(`/page/${newPage.id}`);
+  const handleNewPage = async () => {
+    const newPage = await createPage("Без названия");
+    if (newPage) {
+      navigate(`/page/${newPage.id}`);
+    }
   };
 
   const formatDate = (date: Date) => {

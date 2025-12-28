@@ -110,7 +110,7 @@ const coverImages = [
 export const PageEditorPage = (): JSX.Element => {
   const { pageId } = useParams<{ pageId: string }>();
   const navigate = useNavigate();
-  const { getPage, updatePage, toggleFavorite, setCurrentPageId, getPagePath } = useWorkspace();
+  const { getPage, updatePage, toggleFavorite, setCurrentPageId, getPagePath, loadBlocks } = useWorkspace();
   
   const page = pageId ? getPage(pageId) : null;
   const [isEditingTitle, setIsEditingTitle] = useState(false);
@@ -126,8 +126,9 @@ export const PageEditorPage = (): JSX.Element => {
   useEffect(() => {
     if (pageId) {
       setCurrentPageId(pageId);
+      loadBlocks(pageId);
     }
-  }, [pageId, setCurrentPageId]);
+  }, [pageId, setCurrentPageId, loadBlocks]);
 
   useEffect(() => {
     if (page) {
@@ -157,23 +158,23 @@ export const PageEditorPage = (): JSX.Element => {
     );
   }
 
-  const handleTitleChange = (newTitle: string) => {
+  const handleTitleChange = async (newTitle: string) => {
     setTitle(newTitle);
-    updatePage(page.id, { title: newTitle || "Без названия" });
+    await updatePage(page.id, { title: newTitle || "Без названия" });
   };
 
-  const handleIconChange = (emoji: string) => {
-    updatePage(page.id, { icon: emoji });
+  const handleIconChange = async (emoji: string) => {
+    await updatePage(page.id, { icon: emoji });
     setShowEmojiPicker(false);
   };
 
-  const handleCoverChange = (cover: string) => {
-    updatePage(page.id, { cover });
+  const handleCoverChange = async (cover: string) => {
+    await updatePage(page.id, { cover });
     setShowCoverMenu(false);
   };
 
-  const handleRemoveCover = () => {
-    updatePage(page.id, { cover: undefined });
+  const handleRemoveCover = async () => {
+    await updatePage(page.id, { cover: undefined });
     setShowCoverMenu(false);
   };
 
@@ -232,7 +233,7 @@ export const PageEditorPage = (): JSX.Element => {
                 <Button
                   variant="ghost"
                   size="sm"
-                  onClick={() => toggleFavorite(page.id)}
+                  onClick={async () => await toggleFavorite(page.id)}
                   className="h-7 px-2 hover:bg-white/10"
                 >
                   <Star className={`w-4 h-4 ${page.isFavorite ? "fill-[#ffd700] text-[#ffd700]" : "text-white/80"}`} />
@@ -339,7 +340,7 @@ export const PageEditorPage = (): JSX.Element => {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => toggleFavorite(page.id)}
+                onClick={async () => await toggleFavorite(page.id)}
                 className="h-7 px-2"
               >
                 <Star className={`w-4 h-4 ${page.isFavorite ? "fill-[#f5c518] text-[#f5c518]" : "text-[#9b9a97]"}`} />

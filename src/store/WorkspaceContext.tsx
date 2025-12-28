@@ -115,11 +115,18 @@ export const WorkspaceProvider = ({ children }: { children: ReactNode }) => {
 
       console.log('[WorkspaceContext] Loaded blocks:', data?.length);
 
-      return (data || []).map(b => ({
+      const blocks = (data || []).map(b => ({
         id: b.id,
         type: b.type as any,
         content: b.content || '',
       }));
+
+      // Update local state with loaded blocks
+      setPages(prev => prev.map(page =>
+        page.id === pageId ? { ...page, blocks } : page
+      ));
+
+      return blocks;
     } catch (error) {
       console.error('[WorkspaceContext] Exception loading blocks:', error);
       return [];

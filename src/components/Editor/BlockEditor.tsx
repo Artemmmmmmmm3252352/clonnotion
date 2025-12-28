@@ -107,26 +107,26 @@ const BlockMenu = ({ pageId, block, onClose, position }: BlockMenuProps) => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [onClose]);
 
-  const handleDuplicate = () => {
-    duplicateBlock(pageId, block.id);
+  const handleDuplicate = async () => {
+    await duplicateBlock(pageId, block.id);
     onClose();
   };
 
-  const handleDelete = () => {
-    deleteBlock(pageId, block.id);
+  const handleDelete = async () => {
+    await deleteBlock(pageId, block.id);
     onClose();
   };
 
-  const handleTurnInto = (type: BlockType) => {
-    updateBlock(pageId, block.id, { type });
+  const handleTurnInto = async (type: BlockType) => {
+    await updateBlock(pageId, block.id, { type });
     setShowTurnInto(false);
     onClose();
   };
 
-  const handleColorChange = (colorId: string) => {
+  const handleColorChange = async (colorId: string) => {
     const color = blockColors.find(c => c.id === colorId);
     if (color) {
-      updateBlock(pageId, block.id, { color: colorId });
+      await updateBlock(pageId, block.id, { color: colorId });
     }
     setShowColors(false);
     onClose();
@@ -318,8 +318,8 @@ export const BlockEditor = ({ pageId, block, index, onFocus }: BlockEditorProps)
   const [isDragging, setIsDragging] = useState(false);
   const blockRef = useRef<HTMLDivElement>(null);
 
-  const handleContentChange = useCallback((content: string) => {
-    updateBlock(pageId, block.id, { content });
+  const handleContentChange = useCallback(async (content: string) => {
+    await updateBlock(pageId, block.id, { content });
   }, [pageId, block.id, updateBlock]);
 
   const handleSlashCommand = useCallback((filter: string) => {
@@ -332,37 +332,37 @@ export const BlockEditor = ({ pageId, block, index, onFocus }: BlockEditorProps)
     setSlashFilter("");
   }, []);
 
-  const handleKeyDown = useCallback((e: KeyboardEvent<HTMLDivElement>) => {
+  const handleKeyDown = useCallback(async (e: KeyboardEvent<HTMLDivElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       if (showSlashMenu) {
         return;
       }
-      addBlock(pageId, { type: "text", content: "" }, block.id);
+      await addBlock(pageId, { type: "text", content: "" }, block.id);
     }
-    
+
     if (e.key === "Backspace" && block.content === "" && block.type !== "text") {
       e.preventDefault();
-      updateBlock(pageId, block.id, { type: "text" });
+      await updateBlock(pageId, block.id, { type: "text" });
     }
-    
+
     if (e.key === "Escape") {
       setShowSlashMenu(false);
     }
   }, [showSlashMenu, addBlock, pageId, block.id, block.content, block.type, updateBlock]);
 
-  const handleBlockTypeSelect = useCallback((type: BlockType) => {
+  const handleBlockTypeSelect = useCallback(async (type: BlockType) => {
     const defaults: Partial<Block> = { type, content: "" };
     if (type === "todo") {
       defaults.checked = false;
     }
-    updateBlock(pageId, block.id, defaults);
+    await updateBlock(pageId, block.id, defaults);
     setShowSlashMenu(false);
     setSlashFilter("");
   }, [pageId, block.id, updateBlock]);
 
-  const handleCheckboxChange = useCallback((checked: boolean) => {
-    updateBlock(pageId, block.id, { checked });
+  const handleCheckboxChange = useCallback(async (checked: boolean) => {
+    await updateBlock(pageId, block.id, { checked });
   }, [pageId, block.id, updateBlock]);
 
   const handleMenuClick = useCallback((e: React.MouseEvent) => {
@@ -609,7 +609,7 @@ export const BlockEditor = ({ pageId, block, index, onFocus }: BlockEditorProps)
       <div className={`flex items-center gap-0.5 transition-opacity duration-150 ${isHovered ? "opacity-100" : "opacity-0"}`}>
         <button
           className="w-6 h-6 flex items-center justify-center rounded hover:bg-[#efefec] transition-colors"
-          onClick={() => addBlock(pageId, { type: "text", content: "" }, block.id)}
+          onClick={async () => await addBlock(pageId, { type: "text", content: "" }, block.id)}
         >
           <Plus className="w-4 h-4 text-[#9b9a97]" />
         </button>

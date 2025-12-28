@@ -32,9 +32,8 @@ const viewLabels: Record<ViewType, string> = {
 export const DatabasePage = (): JSX.Element => {
   const { databaseId } = useParams<{ databaseId: string }>();
   const navigate = useNavigate();
-  const { workspace } = useWorkspace();
-  
-  const database = workspace.databases.find(db => db.id === databaseId);
+
+  const database = null;
   const [currentView, setCurrentView] = useState<ViewType>("table");
   const [sortField, setSortField] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");

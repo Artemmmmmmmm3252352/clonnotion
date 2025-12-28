@@ -8,31 +8,17 @@ import { Card, CardContent } from "../../components/ui/card";
 export const SearchPage = (): JSX.Element => {
   const [query, setQuery] = useState("");
   const navigate = useNavigate();
-  const { workspace } = useWorkspace();
+  const { pages } = useWorkspace();
 
-  const filteredPages = workspace.pages.filter(page => 
+  const filteredPages = pages.filter(page =>
     !page.isArchived && (
       page.title.toLowerCase().includes(query.toLowerCase()) ||
-      page.blocks.some(block => block.content.toLowerCase().includes(query.toLowerCase()))
+      page.blocks.some(block => block.content?.toLowerCase().includes(query.toLowerCase()))
     )
   );
 
-  const filteredDatabases = workspace.databases.filter(db =>
-    db.name.toLowerCase().includes(query.toLowerCase()) ||
-    db.rows.some(row => 
-      Object.values(row.properties).some(val => 
-        String(val).toLowerCase().includes(query.toLowerCase())
-      )
-    )
-  );
-
-  const matchingRows = workspace.databases.flatMap(db =>
-    db.rows.filter(row =>
-      Object.values(row.properties).some(val =>
-        String(val).toLowerCase().includes(query.toLowerCase())
-      )
-    ).map(row => ({ ...row, databaseName: db.name, databaseId: db.id }))
-  );
+  const filteredDatabases: any[] = [];
+  const matchingRows: any[] = [];
 
   const highlightText = (text: string, highlight: string) => {
     if (!highlight.trim()) return text;
