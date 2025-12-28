@@ -38,7 +38,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    console.log('[AuthContext] Initializing...');
     supabase.auth.getSession().then(({ data: { session } }) => {
+      console.log('[AuthContext] Initial session:', session?.user?.email || 'None');
       setSession(session);
       setUser(session?.user ?? null);
       if (session?.user) {
@@ -48,8 +50,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       (async () => {
+        console.log('[AuthContext] Auth state changed:', event, session?.user?.email || 'None');
         setSession(session);
         setUser(session?.user ?? null);
         if (session?.user) {
@@ -65,6 +68,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const loadProfile = async (userId: string) => {
+    console.log('[AuthContext] Loading profile for user:', userId);
     try {
       const { data, error } = await supabase
         .from('profiles')
@@ -72,11 +76,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         .eq('id', userId)
         .maybeSingle();
 
-      if (error) throw error;
+      if (error) {
+        console.error('[AuthContext] Error loading profile:', error);
+        throw error;
+      }
+
+      console.log('[AuthContext] Profile loaded:', data?.email);
       setProfile(data);
     } catch (error) {
-      console.error('Error loading profile:', error);
+      console.error('[AuthContext] Exception loading profile:', error);
     } finally {
+      console.log('[AuthContext] Auth loading complete');
       setLoading(false);
     }
   };

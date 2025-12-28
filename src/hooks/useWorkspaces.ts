@@ -39,7 +39,13 @@ export const useWorkspaces = () => {
   }, [user]);
 
   const loadWorkspaces = async () => {
-    if (!user) return;
+    if (!user) {
+      console.log('[useWorkspaces] No user, skipping load');
+      setLoading(false);
+      return;
+    }
+
+    console.log('[useWorkspaces] Loading workspaces for user:', user.email);
 
     try {
       const { data: memberships, error } = await supabase
@@ -47,21 +53,33 @@ export const useWorkspaces = () => {
         .select('workspace_id, role, workspaces(*)')
         .eq('user_id', user.id);
 
-      if (error) throw error;
+      if (error) {
+        console.error('[useWorkspaces] Error loading workspaces:', error);
+        setLoading(false);
+        return;
+      }
+
+      console.log('[useWorkspaces] Memberships:', memberships);
 
       const workspaceList = memberships?.map((m: any) => ({
         ...m.workspaces,
         role: m.role,
       })) || [];
 
+      console.log('[useWorkspaces] Workspace list:', workspaceList);
+
       setWorkspaces(workspaceList);
 
       if (workspaceList.length > 0 && !currentWorkspace) {
         const personal = workspaceList.find((w: Workspace) => w.is_personal);
-        setCurrentWorkspace(personal || workspaceList[0]);
+        const selected = personal || workspaceList[0];
+        console.log('[useWorkspaces] Setting current workspace:', selected);
+        setCurrentWorkspace(selected);
+      } else if (workspaceList.length === 0) {
+        console.warn('[useWorkspaces] No workspaces found for user');
       }
     } catch (error) {
-      console.error('Error loading workspaces:', error);
+      console.error('[useWorkspaces] Exception loading workspaces:', error);
     } finally {
       setLoading(false);
     }
