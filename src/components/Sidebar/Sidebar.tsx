@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import {
-  ChevronRight, Plus, Star, MoreHorizontal, Home, FileText, Database, Trash2, Search,
+import { 
+  ChevronRight, Plus, Star, MoreHorizontal, Home, FileText, Database, Trash2, Search, 
   Copy, Edit2, Inbox, Settings, Users
 } from "lucide-react";
 import { useWorkspace } from "../../store";
@@ -14,7 +14,7 @@ interface PageMenuProps {
 }
 
 const PageMenu = ({ page, onClose, position }: PageMenuProps) => {
-  const { deletePage, updatePage, toggleFavorite } = useWorkspace();
+  const { deletePage, duplicatePage, toggleFavorite, updatePage } = useWorkspace();
   const navigate = useNavigate();
   const menuRef = useRef<HTMLDivElement>(null);
   const [isRenaming, setIsRenaming] = useState(false);
@@ -30,22 +30,30 @@ const PageMenu = ({ page, onClose, position }: PageMenuProps) => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [onClose]);
 
-  const handleRename = async () => {
+  const handleRename = () => {
     if (newTitle.trim()) {
-      await updatePage(page.id, { title: newTitle.trim() });
+      updatePage(page.id, { title: newTitle.trim() });
     }
     setIsRenaming(false);
     onClose();
   };
 
-  const handleDelete = async () => {
-    await deletePage(page.id);
+  const handleDuplicate = () => {
+    const newPage = duplicatePage(page.id);
+    if (newPage) {
+      navigate(`/page/${newPage.id}`);
+    }
+    onClose();
+  };
+
+  const handleDelete = () => {
+    deletePage(page.id);
     navigate("/");
     onClose();
   };
 
-  const handleFavorite = async () => {
-    await toggleFavorite(page.id);
+  const handleFavorite = () => {
+    toggleFavorite(page.id);
     onClose();
   };
 
@@ -84,6 +92,13 @@ const PageMenu = ({ page, onClose, position }: PageMenuProps) => {
         Переименовать
       </button>
       <button
+        onClick={handleDuplicate}
+        className="w-full flex items-center gap-2 px-3 py-1.5 text-sm text-[#37352f] hover:bg-[#efefec] text-left"
+      >
+        <Copy className="w-4 h-4" />
+        Дублировать
+      </button>
+      <button
         onClick={handleFavorite}
         className="w-full flex items-center gap-2 px-3 py-1.5 text-sm text-[#37352f] hover:bg-[#efefec] text-left"
       >
@@ -111,21 +126,10 @@ const PageItem = ({ page, level }: PageItemProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [menuPosition, setMenuPosition] = useState<{ x: number; y: number } | null>(null);
-  const [childPages, setChildPages] = useState<Page[]>([]);
   const { currentPageId, setCurrentPageId, getChildPages, toggleFavorite } = useWorkspace();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    if (isExpanded) {
-      loadChildren();
-    }
-  }, [isExpanded, page.id]);
-
-  const loadChildren = async () => {
-    const children = await getChildPages(page.id);
-    setChildPages(children);
-  };
-
+  
+  const childPages = getChildPages(page.id);
   const hasChildren = childPages.length > 0;
   const isActive = currentPageId === page.id;
 
@@ -162,22 +166,22 @@ const PageItem = ({ page, level }: PageItemProps) => {
         >
           <ChevronRight className="w-3 h-3 text-[#9b9a97]" />
         </button>
-
+        
         <span className="text-base mr-1">{page.icon || "📄"}</span>
         <span className="text-sm text-[#37352f] flex-1 truncate">{page.title}</span>
-
+        
         {isHovered && (
           <div className="flex items-center gap-0.5">
             <button
               className="w-5 h-5 flex items-center justify-center rounded hover:bg-[#ddd]"
-              onClick={async (e) => {
+              onClick={(e) => {
                 e.stopPropagation();
-                await toggleFavorite(page.id);
+                toggleFavorite(page.id);
               }}
             >
               <Star className={`w-3 h-3 ${page.isFavorite ? "fill-[#f5c518] text-[#f5c518]" : "text-[#9b9a97]"}`} />
             </button>
-            <button
+            <button 
               className="w-5 h-5 flex items-center justify-center rounded hover:bg-[#ddd]"
               onClick={handleMenuClick}
             >
@@ -186,7 +190,7 @@ const PageItem = ({ page, level }: PageItemProps) => {
           </div>
         )}
       </div>
-
+      
       {menuPosition && (
         <PageMenu
           page={page}
@@ -194,7 +198,7 @@ const PageItem = ({ page, level }: PageItemProps) => {
           onClose={() => setMenuPosition(null)}
         />
       )}
-
+      
       {isExpanded && hasChildren && (
         <div>
           {childPages.map(child => (
@@ -239,23 +243,30 @@ const TemplateModal = ({ onClose, onCreate }: TemplateModalProps) => {
             <h2 className="text-lg font-semibold text-[#37352f]">Создать страницу</h2>
             <button onClick={onClose} className="text-[#9b9a97] hover:text-[#37352f]">✕</button>
           </div>
-          <input
-            type="text"
-            placeholder="Поиск шаблонов..."
+          <input 
+            type="text" 
+            placeholder="Поиск шаблонов..." 
             className="w-full px-3 py-2 border border-[#e6e4df] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#2383e2]"
           />
         </div>
 
         <div className="p-6">
           <div className="grid grid-cols-3 gap-4 mb-6">
-            <button
+            <button 
               onClick={() => onCreate('page')}
               className="flex flex-col items-center p-4 border border-[#e6e4df] rounded-lg hover:bg-[#f7f6f3] transition-colors"
             >
               <FileText className="w-8 h-8 text-[#9b9a97] mb-2" />
               <span className="text-sm font-medium text-[#37352f]">Пустая страница</span>
             </button>
-            <button
+            <button 
+              onClick={() => onCreate('database')}
+              className="flex flex-col items-center p-4 border border-[#e6e4df] rounded-lg hover:bg-[#f7f6f3] transition-colors"
+            >
+              <Database className="w-8 h-8 text-[#9b9a97] mb-2" />
+              <span className="text-sm font-medium text-[#37352f]">Пустая база данных</span>
+            </button>
+            <button 
               onClick={() => onCreate('page')}
               className="flex flex-col items-center p-4 border border-[#e6e4df] rounded-lg hover:bg-[#f7f6f3] transition-colors"
             >
@@ -291,44 +302,25 @@ const TemplateModal = ({ onClose, onCreate }: TemplateModalProps) => {
 export const Sidebar = (): JSX.Element => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { getRootPages, getFavoritePages, createPage, setCurrentPageId, currentWorkspace } = useWorkspace();
+  const { workspace, getRootPages, getFavoritePages, createPage, setCurrentPageId, createDatabase } = useWorkspace();
   const [showTemplateModal, setShowTemplateModal] = useState(false);
-  const [rootPages, setRootPages] = useState<Page[]>([]);
-  const [favoritePages, setFavoritePages] = useState<Page[]>([]);
+  
+  const rootPages = getRootPages();
+  const favoritePages = getFavoritePages();
 
-  useEffect(() => {
-    if (currentWorkspace) {
-      loadPages();
-    }
-  }, [currentWorkspace]);
-
-  const loadPages = async () => {
-    const root = await getRootPages();
-    const favorites = await getFavoritePages();
-    setRootPages(root);
-    setFavoritePages(favorites);
-  };
-
-  const handleTemplateCreate = async (type: 'page' | 'database' | 'template', templateId?: string) => {
+  const handleTemplateCreate = (type: 'page' | 'database' | 'template', templateId?: string) => {
     setShowTemplateModal(false);
     if (type === 'page') {
-      const newPage = await createPage("Без названия");
-      if (newPage) {
-        setCurrentPageId(newPage.id);
-        navigate(`/page/${newPage.id}`);
-      }
+      const newPage = createPage("Без названия");
+      setCurrentPageId(newPage.id);
+      navigate(`/page/${newPage.id}`);
+    } else if (type === 'database') {
+      const newDb = createDatabase("Без названия");
+      navigate(`/database/${newDb.id}`);
     } else if (type === 'template' && templateId) {
-      const templateNames: Record<string, string> = {
-        tasks: 'Трекер задач',
-        projects: 'Проекты',
-        notes: 'Заметки встреч',
-        docs: 'Документы'
-      };
-      const newPage = await createPage(templateNames[templateId] || 'Без названия');
-      if (newPage) {
-        setCurrentPageId(newPage.id);
-        navigate(`/page/${newPage.id}`);
-      }
+      const newPage = createPage(templateId === 'tasks' ? 'Трекер задач' : templateId === 'projects' ? 'Проекты' : templateId === 'notes' ? 'Заметки встреч' : 'Документы');
+      setCurrentPageId(newPage.id);
+      navigate(`/page/${newPage.id}`);
     }
   };
 
@@ -347,9 +339,7 @@ export const Sidebar = (): JSX.Element => {
     <aside className="w-60 h-full flex flex-col bg-[#f7f6f3] border-r border-[#e6e4df] overflow-hidden">
       <header className="flex items-center gap-2 px-3 py-3 border-b border-[#e6e4df]">
         <span className="text-lg">📝</span>
-        <h1 className="text-sm font-semibold text-[#37352f] flex-1">
-          {currentWorkspace?.name || 'NoteZero'}
-        </h1>
+        <h1 className="text-sm font-semibold text-[#37352f] flex-1">NoteZero</h1>
       </header>
 
       <div className="flex-1 overflow-y-auto py-2">
@@ -391,6 +381,23 @@ export const Sidebar = (): JSX.Element => {
           </div>
         </div>
 
+        <div className="mb-2">
+          <div className="px-4 py-1">
+            <span className="text-[11px] text-[#9b9a97] font-medium uppercase tracking-wide">
+              Общее
+            </span>
+          </div>
+          <div className="px-2">
+            <button
+              onClick={() => {}}
+              className="w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-left transition-colors hover:bg-[#efefec]"
+            >
+              <Plus className="w-4 h-4 text-[#9b9a97]" />
+              <span className="text-sm text-[#9b9a97]">Начать совместную работу</span>
+            </button>
+          </div>
+        </div>
+
         {favoritePages.length > 0 && (
           <div className="mb-2">
             <div className="px-4 py-1">
@@ -401,6 +408,28 @@ export const Sidebar = (): JSX.Element => {
             <div className="px-2">
               {favoritePages.map(page => (
                 <PageItem key={page.id} page={page} level={0} />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {workspace.databases.length > 0 && (
+          <div className="mb-2">
+            <div className="px-4 py-1">
+              <span className="text-[11px] text-[#9b9a97] font-medium uppercase tracking-wide">
+                Базы данных
+              </span>
+            </div>
+            <div className="px-2">
+              {workspace.databases.map(db => (
+                <button
+                  key={db.id}
+                  onClick={() => navigate(`/database/${db.id}`)}
+                  className="w-full flex items-center gap-2 px-2 py-1.5 rounded-md text-left transition-colors hover:bg-[#efefec]"
+                >
+                  <span className="text-base">{db.icon || "📋"}</span>
+                  <span className="text-sm text-[#37352f]">{db.name}</span>
+                </button>
               ))}
             </div>
           </div>
@@ -425,9 +454,21 @@ export const Sidebar = (): JSX.Element => {
         })}
       </div>
 
+      <div className="px-3 py-3 border-t border-[#e6e4df]">
+        <button
+          className="w-full flex items-center gap-2 px-2 py-2 rounded-lg bg-[#f0f0ee] hover:bg-[#e6e4df] text-left transition-colors"
+        >
+          <Users className="w-4 h-4 text-[#9b9a97]" />
+          <div className="flex-1">
+            <div className="text-xs text-[#9b9a97]">Пригласить участников</div>
+            <div className="text-[10px] text-[#9b9a97]">Работайте вместе с командой</div>
+          </div>
+        </button>
+      </div>
+
       {showTemplateModal && (
-        <TemplateModal
-          onClose={() => setShowTemplateModal(false)}
+        <TemplateModal 
+          onClose={() => setShowTemplateModal(false)} 
           onCreate={handleTemplateCreate}
         />
       )}
