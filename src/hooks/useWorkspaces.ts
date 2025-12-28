@@ -96,12 +96,21 @@ export const useWorkspaces = () => {
     console.log('[useWorkspaces] Current session:', {
       user_id: session?.user?.id,
       has_token: !!session?.access_token,
+      token_preview: session?.access_token?.substring(0, 30) + '...',
       expires_at: session?.expires_at
     });
 
     if (!session) {
       console.error('[useWorkspaces] No active session');
       return { error: new Error('No active session. Please log in again.') };
+    }
+
+    // Test auth.uid() by calling a test function
+    try {
+      const { data: testAuth, error: testError } = await supabase.rpc('get_current_user_id');
+      console.log('[useWorkspaces] Test auth.uid():', testAuth, 'Error:', testError);
+    } catch (e) {
+      console.log('[useWorkspaces] Test function not available (this is OK)');
     }
 
     console.log('[useWorkspaces] Creating workspace:', { name, slug, owner_id: user.id });
