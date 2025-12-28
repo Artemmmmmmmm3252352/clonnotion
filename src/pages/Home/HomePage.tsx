@@ -4,19 +4,40 @@ import { Badge } from "../../components/ui/badge";
 import { Button } from "../../components/ui/button";
 import { Card, CardContent } from "../../components/ui/card";
 import { useWorkspace } from "../../store";
+import { useState, useEffect } from "react";
+import { Page } from "../../store/types";
 
 export const HomePage = (): JSX.Element => {
-  const { workspace, createPage } = useWorkspace();
+  const { createPage, getRootPages, getFavoritePages, currentWorkspace, loading } = useWorkspace();
   const navigate = useNavigate();
+  const [favoritePages, setFavoritePages] = useState<Page[]>([]);
+  const [recentPages, setRecentPages] = useState<Page[]>([]);
 
-  const favoritePages = workspace.pages.filter(p => p.isFavorite && !p.isArchived);
+  useEffect(() => {
+    if (currentWorkspace) {
+      loadPages();
+    }
+  }, [currentWorkspace]);
 
-  const recentPages = [...workspace.pages]
-    .filter(p => !p.isArchived)
-    .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
-    .slice(0, 5);
+  const loadPages = async () => {
+    const favorites = await getFavoritePages();
+    const recent = await getRootPages();
+    setFavoritePages(favorites);
+    setRecentPages(recent.slice(0, 5));
+  };
 
-  const databases = workspace.databases;
+  if (loading || !currentWorkspace) {
+    return (
+      <div className="w-full min-h-screen bg-[#fafaf9] flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-[#2383e2] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-[#9b9a97]">Загрузка рабочего пространства...</p>
+        </div>
+      </div>
+    );
+  }
+
+  const databases: any[] = [];
 
   const handlePageClick = (pageId: string) => {
     navigate(`/page/${pageId}`);
@@ -26,9 +47,11 @@ export const HomePage = (): JSX.Element => {
     navigate(`/database/${dbId}`);
   };
 
-  const handleNewPage = () => {
-    const newPage = createPage("Без названия");
-    navigate(`/page/${newPage.id}`);
+  const handleNewPage = async () => {
+    const newPage = await createPage("Без названия");
+    if (newPage) {
+      navigate(`/page/${newPage.id}`);
+    }
   };
 
   const formatDate = (date: Date) => {
