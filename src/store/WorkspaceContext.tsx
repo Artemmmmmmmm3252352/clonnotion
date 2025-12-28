@@ -134,9 +134,13 @@ export const WorkspaceProvider = ({ children }: { children: ReactNode }) => {
     }
   }, []);
 
+  // Load pages when workspace changes
   useEffect(() => {
+    console.log('[WorkspaceContext] Workspace changed, reloading pages:', currentWorkspace?.id);
+    setPages([]); // Clear pages before loading new ones
+    setCurrentPageId(null); // Clear current page
     loadPages();
-  }, [loadPages]);
+  }, [currentWorkspace?.id, user?.id]);
 
   const createPage = useCallback(async (title: string, parentId: string | null = null): Promise<Page | null> => {
     if (!currentWorkspace || !user) {
