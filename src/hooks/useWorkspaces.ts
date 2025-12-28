@@ -91,6 +91,19 @@ export const useWorkspaces = () => {
       return { error: new Error('No user logged in') };
     }
 
+    // Check session
+    const { data: { session } } = await supabase.auth.getSession();
+    console.log('[useWorkspaces] Current session:', {
+      user_id: session?.user?.id,
+      has_token: !!session?.access_token,
+      expires_at: session?.expires_at
+    });
+
+    if (!session) {
+      console.error('[useWorkspaces] No active session');
+      return { error: new Error('No active session. Please log in again.') };
+    }
+
     console.log('[useWorkspaces] Creating workspace:', { name, slug, owner_id: user.id });
 
     try {
