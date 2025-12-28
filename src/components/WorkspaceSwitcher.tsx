@@ -5,20 +5,28 @@ import { Input } from './ui/input';
 import { Check, ChevronDown, Plus } from 'lucide-react';
 
 export const WorkspaceSwitcher: React.FC = () => {
-  const { workspaces, currentWorkspace, switchWorkspace, createWorkspace } = useWorkspaces();
+  const { workspaces, currentWorkspace, switchWorkspace, createWorkspace, loading } = useWorkspaces();
   const [isOpen, setIsOpen] = useState(false);
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [newWorkspaceName, setNewWorkspaceName] = useState('');
   const [creating, setCreating] = useState(false);
 
   const handleCreateWorkspace = async () => {
-    if (!newWorkspaceName.trim()) return;
+    if (!newWorkspaceName.trim()) {
+      console.log('[WorkspaceSwitcher] Empty workspace name');
+      return;
+    }
 
+    console.log('[WorkspaceSwitcher] Creating workspace:', newWorkspaceName);
     setCreating(true);
-    const slug = newWorkspaceName.toLowerCase().replace(/\s+/g, '-');
+    const slug = newWorkspaceName.toLowerCase().replace(/\s+/g, '-') + '-' + Date.now();
     const { error } = await createWorkspace(newWorkspaceName, slug);
 
-    if (!error) {
+    if (error) {
+      console.error('[WorkspaceSwitcher] Error creating workspace:', error);
+      alert(`Ошибка создания workspace: ${error.message}`);
+    } else {
+      console.log('[WorkspaceSwitcher] Workspace created successfully');
       setNewWorkspaceName('');
       setShowCreateForm(false);
       setIsOpen(false);
@@ -27,7 +35,29 @@ export const WorkspaceSwitcher: React.FC = () => {
     setCreating(false);
   };
 
-  if (!currentWorkspace) return null;
+  if (loading) {
+    return (
+      <div className="animate-pulse">
+        <div className="h-10 bg-gray-200 rounded"></div>
+      </div>
+    );
+  }
+
+  if (!currentWorkspace && workspaces.length === 0) {
+    return (
+      <div className="text-xs text-gray-500 py-1">
+        No workspace available
+      </div>
+    );
+  }
+
+  if (!currentWorkspace) {
+    return (
+      <div className="text-xs text-gray-500 py-1">
+        Loading workspace...
+      </div>
+    );
+  }
 
   return (
     <div className="relative">

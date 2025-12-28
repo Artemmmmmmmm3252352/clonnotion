@@ -86,7 +86,12 @@ export const useWorkspaces = () => {
   };
 
   const createWorkspace = async (name: string, slug: string) => {
-    if (!user) return { error: new Error('No user logged in') };
+    if (!user) {
+      console.error('[useWorkspaces] No user logged in');
+      return { error: new Error('No user logged in') };
+    }
+
+    console.log('[useWorkspaces] Creating workspace:', { name, slug, owner_id: user.id });
 
     try {
       const { data: workspace, error: workspaceError } = await supabase
@@ -100,7 +105,12 @@ export const useWorkspaces = () => {
         .select()
         .single();
 
-      if (workspaceError) throw workspaceError;
+      if (workspaceError) {
+        console.error('[useWorkspaces] Error creating workspace:', workspaceError);
+        throw workspaceError;
+      }
+
+      console.log('[useWorkspaces] Workspace created:', workspace);
 
       const { error: memberError } = await supabase
         .from('workspace_members')
@@ -110,11 +120,18 @@ export const useWorkspaces = () => {
           role: 'owner',
         });
 
-      if (memberError) throw memberError;
+      if (memberError) {
+        console.error('[useWorkspaces] Error adding member:', memberError);
+        throw memberError;
+      }
+
+      console.log('[useWorkspaces] Member added successfully');
 
       await loadWorkspaces();
+      console.log('[useWorkspaces] Workspaces reloaded');
       return { data: workspace, error: null };
     } catch (error) {
+      console.error('[useWorkspaces] Exception in createWorkspace:', error);
       return { error: error as Error };
     }
   };
