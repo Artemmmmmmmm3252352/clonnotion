@@ -1,9 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import {
-  ChevronRight, Plus, Star, MoreHorizontal, Home, FileText, Database, Trash2, Search,
-  Copy, Edit2, Inbox, Settings, Users, Share2, LogOut
-} from "lucide-react";
+import { ChevronRight, Plus, Star, MoveHorizontal as MoreHorizontal, Chrome as Home, FileText, Database, Trash2, Search, Copy, CreditCard as Edit2, Inbox, Settings, Users, Share2, LogOut } from "lucide-react";
 import { useWorkspace } from "../../store";
 import { useAuth } from "../../contexts/AuthContext";
 import { useWorkspaces } from "../../hooks/useWorkspaces";
